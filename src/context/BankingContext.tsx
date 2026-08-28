@@ -113,7 +113,7 @@ interface BankingContextType {
 
 const BankingContext = createContext<BankingContextType | undefined>(undefined);
 
-const STORAGE_PREFIX = 'novabank_v3_';
+const STORAGE_PREFIX = 'hsbc_banking_v1_';
 
 export const BankingProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   // Load state from localStorage or use initial seed
@@ -389,7 +389,7 @@ export const BankingProvider: React.FC<{ children: React.ReactNode }> = ({ child
       currency: 'USD',
       status: 'Completed',
       date: nowIso,
-      reference: params.reference || `TRF-NOVA-${Date.now().toString().slice(-6)}`,
+      reference: params.reference || `TRF-HSBC-${Date.now().toString().slice(-6)}`,
       recipientOrSender: `${params.recipientName} **${params.recipientAccount.slice(-4)}`,
       fee: 0.00,
       riskScore: params.amount > 5000 ? 'Medium' : 'Low',
@@ -588,7 +588,7 @@ export const BankingProvider: React.FC<{ children: React.ReactNode }> = ({ child
       accountId: fromAcc.id,
       accountName: `${fromAcc.name} **${fromAcc.accountNumber}`,
       description: `Deposit to Goal: ${goal.name}`,
-      merchantName: 'Nova Savings Vault',
+      merchantName: 'HSBC Savings Vault',
       category: 'Transfer',
       amount: -amount,
       currency: 'USD',
@@ -628,7 +628,7 @@ export const BankingProvider: React.FC<{ children: React.ReactNode }> = ({ child
       accountId: toAcc.id,
       accountName: `${toAcc.name} **${toAcc.accountNumber}`,
       description: `Withdrawal from Goal: ${goal.name}`,
-      merchantName: 'Nova Savings Vault',
+      merchantName: 'HSBC Savings Vault',
       category: 'Transfer',
       amount: amount,
       currency: 'USD',

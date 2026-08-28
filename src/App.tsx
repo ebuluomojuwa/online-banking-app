@@ -136,7 +136,7 @@ const BankingAppInner: React.FC = () => {
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
               <span>
-                <strong>Nova Bank Prototype:</strong> Fictional banking demonstration with simulated local persistence.
+                <strong>HSBC Digital Banking Prototype:</strong> Demonstration with simulated local persistence.
               </span>
             </div>
             <button
@@ -155,10 +155,10 @@ const BankingAppInner: React.FC = () => {
       <footer className="border-t border-[#38080E] bg-[#0E0103]/80 px-6 sm:px-10 py-3 flex items-center justify-between text-xs text-rose-300/70 transition-colors">
         <div className="flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-          <span className="text-rose-200">System Operational</span>
+          <span className="text-rose-200">HSBC Global Gateway Active</span>
         </div>
         <div className="text-[11px] text-rose-400/80 hidden sm:block">
-          Nova Bank International • Simulated Banking Environment
+          HSBC Digital Banking • Global Prototype Network
         </div>
         <div className="flex items-center gap-4">
           <span className="bg-rose-500/15 text-rose-300 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border border-rose-500/30">

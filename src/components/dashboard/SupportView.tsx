@@ -24,7 +24,7 @@ export const SupportView: React.FC = () => {
 
   // Chat simulator state
   const [messages, setMessages] = useState<Array<{ sender: 'agent' | 'user'; text: string; time: string }>>([
-    { sender: 'agent', text: `Hello ${currentUser.firstName}, welcome to Nova Private Client Concierge. How may I assist with your banking requirements today?`, time: '10:02 AM' },
+    { sender: 'agent', text: `Hello ${currentUser.firstName}, welcome to HSBC Premier Concierge. How may I assist with your banking requirements today?`, time: '10:02 AM' },
   ]);
   const [chatInput, setChatInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -48,11 +48,11 @@ export const SupportView: React.FC = () => {
 
     // Dynamic simulated Concierge reply
     setTimeout(() => {
-      let reply = "Thank you for contacting Nova Bank. I've noted your inquiry in our priority client log. A senior relationship manager has verified your secure session.";
+      let reply = "Thank you for contacting HSBC. I've noted your inquiry in our priority client log. A senior relationship manager has verified your secure session.";
       const lower = userText.toLowerCase();
 
       if (lower.includes('card') || lower.includes('limit')) {
-        reply = "I see your inquiry regarding card management. You can adjust limits dynamically in the Cards & Limits tab, or I can submit an institutional limit increase request for your Nova Black card.";
+        reply = "I see your inquiry regarding card management. You can adjust limits dynamically in the Cards & Limits tab, or I can submit an institutional limit increase request for your HSBC Premier card.";
       } else if (lower.includes('wire') || lower.includes('transfer') || lower.includes('swift')) {
         reply = "Domestic wires post on the same day if sent before 5:00 PM EST. SWIFT international wires take 1-2 business days with full end-to-end tracking.";
       } else if (lower.includes('rate') || lower.includes('apy') || lower.includes('interest')) {
@@ -121,7 +121,7 @@ export const SupportView: React.FC = () => {
               </div>
               <div>
                 <h3 className="text-xs font-bold text-zinc-900 dark:text-white">
-                  Nova Concierge Live Desk
+                  HSBC Concierge Live Desk
                 </h3>
                 <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium">
                   Online • Average reply time &lt; 1 min
@@ -232,7 +232,7 @@ export const SupportView: React.FC = () => {
             <div className="space-y-2 text-xs">
               {[
                 { q: 'How long do international wire transfers take?', a: 'SWIFT transfers generally complete within 1-2 business days.' },
-                { q: 'What is the maximum daily card limit?', a: 'Nova Black metal cards feature up to $25,000 daily spend capacity.' },
+                { q: 'What is the maximum daily card limit?', a: 'HSBC Premier metal cards feature up to $25,000 daily spend capacity.' },
                 { q: 'How does high-yield APY compound?', a: 'Interest accrues on the daily balance and posts on the 1st of every month.' },
               ].map((faq, i) => (
                 <div key={i} className="p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800">

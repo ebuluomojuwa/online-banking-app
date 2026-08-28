@@ -64,7 +64,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title="Sign In to Nova Banking"
+      title="Sign In to HSBC Banking"
       description="Access your personal accounts, business treasury, or admin console."
     >
       <div className="space-y-5 text-xs">

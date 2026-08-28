@@ -75,7 +75,7 @@ export interface Beneficiary {
 }
 
 export type CardType = 'DEBIT' | 'CREDIT' | 'VIRTUAL';
-export type CardTier = 'Nova Titanium' | 'Nova Sapphire' | 'Nova Black Metal' | 'Nova Business Prime';
+export type CardTier = 'HSBC Titanium' | 'HSBC Premier World' | 'HSBC Premier Metal' | 'HSBC Business Prime' | 'Nova Titanium' | 'Nova Sapphire' | 'Nova Black Metal' | 'Nova Business Prime';
 export type CardStatus = 'ACTIVE' | 'FROZEN' | 'BLOCKED' | 'EXPIRED';
 
 export interface Card {

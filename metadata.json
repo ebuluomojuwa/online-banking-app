@@ -1,6 +1,6 @@
 {
-  "name": "Nova Bank",
-  "description": "Sophisticated, modern online banking prototype featuring public showcase, customer dashboard, transactions, simulated transfers, cards, analytics, savings, bills, loans, security center, and administrative risk management.",
+  "name": "HSBC",
+  "description": "HSBC Digital Banking Portal prototype featuring public showcase, customer dashboard, transactions, simulated transfers, cards, analytics, savings, bills, loans, security center, and administrative risk management.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

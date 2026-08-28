@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { useBanking } from '../../context/BankingContext';
 import { Badge, Modal } from '../ui';
+import { HsbcLogo } from '../common/HsbcLogo';
 
 export const StatementsView: React.FC = () => {
   const { accounts, transactions, currentUser } = useBanking();
@@ -146,7 +147,7 @@ export const StatementsView: React.FC = () => {
         <Modal
           isOpen={showStatementPreview}
           onClose={() => setShowStatementPreview(false)}
-          title={`Nova Bank Official Statement - ${selectedMonth}`}
+          title={`HSBC Official Statement - ${selectedMonth}`}
           description={`Account: ${selectedAccount.name} (**${selectedAccount.accountNumber})`}
         >
           <div className="space-y-6 text-xs print:p-0">
@@ -155,13 +156,10 @@ export const StatementsView: React.FC = () => {
               <div className="flex justify-between items-start border-b border-zinc-200 dark:border-zinc-800 pb-4">
                 <div>
                   <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 rounded bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 flex items-center justify-center font-serif font-black text-xs">
-                      N
-                    </div>
-                    <span className="font-serif font-bold text-base tracking-tight text-zinc-900 dark:text-white">NOVA BANK N.A.</span>
+                    <HsbcLogo size="sm" textColor="text-zinc-900 dark:text-white" />
                   </div>
-                  <p className="text-[10px] text-zinc-400 mt-1">100 Wall Street, Floor 32, New York, NY 10005</p>
-                  <p className="text-[10px] text-zinc-400">FDIC Certificate #84920194 | Prototype Disclosures</p>
+                  <p className="text-[10px] text-zinc-400 mt-1">452 Fifth Avenue, New York, NY 10018</p>
+                  <p className="text-[10px] text-zinc-400">HSBC Bank USA, N.A. | Member FDIC</p>
                 </div>
 
                 <div className="text-right">

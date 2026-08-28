@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { useBanking } from '../../context/BankingContext';
 import { Badge } from '../ui';
+import { HsbcLogo } from '../common/HsbcLogo';
 
 interface NavbarProps {
   onOpenSearch: () => void;
@@ -98,19 +99,10 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSearch, onNavigate, onGoTo
             onClick={() => onNavigate(isAuthenticated ? 'dashboard' : 'home')}
             className="flex items-center gap-3 text-left group focus:outline-none"
           >
-            <div className="w-8 h-8 bg-gradient-to-tr from-rose-500 to-amber-500 rounded-lg flex items-center justify-center font-bold text-white text-xs shadow-md shadow-rose-500/20 group-hover:scale-105 transition-transform">
-              N
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-lg font-semibold tracking-tight text-white">
-                  NOVA BANK
-                </h1>
-                <span className="text-[9px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded-md bg-rose-500/15 text-rose-300 border border-rose-500/30">
-                  PREMIER
-                </span>
-              </div>
-            </div>
+            <HsbcLogo size="md" />
+            <span className="text-[9px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded-md bg-rose-500/15 text-rose-300 border border-rose-500/30">
+              PREMIER
+            </span>
           </button>
 
           {/* Navigation Links for Public View */}

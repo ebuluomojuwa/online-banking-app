@@ -157,11 +157,11 @@ export const AccountsDetailView: React.FC = () => {
                 <div>
                   <span className="text-[10px] uppercase font-bold text-zinc-400 block">Domestic Wire / International SWIFT</span>
                   <span className="font-mono text-sm font-bold text-zinc-900 dark:text-white">
-                    NOVAGB2LXXX / WIRE0210
+                    HSBCUS33XXX / WIRE0210
                   </span>
                 </div>
                 <button
-                  onClick={() => handleCopy('NOVAGB2LXXX', 'swift')}
+                  onClick={() => handleCopy('HSBCUS33XXX', 'swift')}
                   className="p-2 rounded-xl bg-white dark:bg-zinc-700 text-zinc-600 dark:text-zinc-200 hover:bg-zinc-100"
                 >
                   {copiedField === 'swift' ? <Check className="w-4 h-4 text-emerald-500" /> : <Copy className="w-4 h-4" />}
@@ -171,8 +171,8 @@ export const AccountsDetailView: React.FC = () => {
               {/* Bank Legal Address */}
               <div className="p-3.5 bg-zinc-50 dark:bg-zinc-800/60 rounded-2xl border border-zinc-100 dark:border-zinc-800 text-xs">
                 <span className="text-[10px] uppercase font-bold text-zinc-400 block">Bank Entity & Domicile</span>
-                <span className="font-semibold text-zinc-900 dark:text-white block mt-0.5">Nova Bank N.A. (Fictional Prototype)</span>
-                <span className="text-zinc-500 block text-[11px]">100 Wall Street, Floor 32, New York, NY 10005</span>
+                <span className="font-semibold text-zinc-900 dark:text-white block mt-0.5">HSBC Bank USA, N.A.</span>
+                <span className="text-zinc-500 block text-[11px]">452 Fifth Avenue, New York, NY 10018</span>
               </div>
             </div>
           </div>

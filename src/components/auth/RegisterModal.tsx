@@ -50,7 +50,7 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title="Open a Nova Bank Account"
+      title="Open an HSBC Account"
       description="Instant onboarding with automated KYC identity verification."
     >
       {step === 1 ? (
@@ -107,7 +107,7 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
               onChange={e => setAccountType(e.target.value)}
               className="w-full p-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white"
             >
-              <option value="CHECKING">Nova Premier Checking ($0 Monthly Fee)</option>
+              <option value="CHECKING">HSBC Premier Checking ($0 Monthly Fee)</option>
               <option value="SAVINGS">High-Yield Reserve Savings (4.75% APY)</option>
               <option value="BUSINESS">Institutional Commercial Vault</option>
             </select>

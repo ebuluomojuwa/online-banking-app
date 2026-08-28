@@ -119,7 +119,7 @@ export const TransfersView: React.FC = () => {
   const handleConfirmTransfer = async () => {
     setIsSubmitting(true);
     try {
-      const generatedRef = reference.trim() || `TRF-NOVA-${Date.now().toString().slice(-6)}`;
+      const generatedRef = reference.trim() || `TRF-HSBC-${Date.now().toString().slice(-6)}`;
       const result = await transferFunds({
         fromAccountId: selectedSourceAccount.id,
         recipientName: recipientSummary.name,
@@ -177,7 +177,7 @@ export const TransfersView: React.FC = () => {
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
           { id: 'INTERNAL', label: 'Between My Accounts', icon: ArrowLeftRight, desc: 'Instant & Free' },
-          { id: 'OTHER_CUSTOMER', label: 'Nova Customer', icon: SendHorizontal, desc: 'Direct Peer Routing' },
+          { id: 'OTHER_CUSTOMER', label: 'HSBC Customer', icon: SendHorizontal, desc: 'Direct Peer Routing' },
           { id: 'DOMESTIC_WIRE', label: 'External ACH / Wire', icon: Building, desc: '1-2 Business Days' },
           { id: 'INTERNATIONAL_SWIFT', label: 'SWIFT International', icon: Globe2, desc: 'Global Currencies' },
         ].map(tab => {
@@ -402,7 +402,7 @@ export const TransfersView: React.FC = () => {
               <ShieldCheck className="w-4 h-4 text-emerald-500" />
               <span>Simulated Prototype Transfer Fee:</span>
             </div>
-            <strong className="text-emerald-600 dark:text-emerald-400 font-bold">$0.00 (Nova Zero-Fee Tier)</strong>
+            <strong className="text-emerald-600 dark:text-emerald-400 font-bold">$0.00 (HSBC Zero-Fee Tier)</strong>
           </div>
 
           {/* Submit Button */}
