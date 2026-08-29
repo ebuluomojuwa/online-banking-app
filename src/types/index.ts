@@ -26,6 +26,7 @@ export interface BankAccount {
 export type TransactionStatus = 'Completed' | 'Pending' | 'Failed' | 'Reversed';
 export type TransactionCategory = 
   | 'Salary' 
+  | 'Income'
   | 'Transfer' 
   | 'Groceries' 
   | 'Utilities' 
@@ -255,8 +256,10 @@ export type Bill = BillPayment;
 export type User = any;
 
 export interface UserProfile {
-
   id: string;
+  customerId: string; // e.g. "HSBC-CUST-482019"
+  username: string; // e.g. "gregoriolind"
+  password?: string;
   email: string;
   firstName: string;
   lastName: string;

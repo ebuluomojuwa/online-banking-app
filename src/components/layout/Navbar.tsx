@@ -259,9 +259,17 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSearch, onNavigate, onGoTo
                     {currentUser.role === 'ADMIN' ? 'ADMIN COMMAND' : 'PREMIER CLIENT'}
                   </div>
                 </div>
-                <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-rose-600 to-amber-600 flex items-center justify-center text-white font-bold text-xs shadow-xs border border-rose-400/30">
-                  {currentUser.firstName.charAt(0)}{currentUser.lastName.charAt(0)}
-                </div>
+                {currentUser.avatarUrl ? (
+                  <img
+                    src={currentUser.avatarUrl}
+                    alt={`${currentUser.firstName} ${currentUser.lastName}`}
+                    className="w-9 h-9 rounded-xl object-cover border border-rose-400/40 shadow-xs"
+                  />
+                ) : (
+                  <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-rose-600 to-amber-600 flex items-center justify-center text-white font-bold text-xs shadow-xs border border-rose-400/30">
+                    {currentUser.firstName.charAt(0)}{currentUser.lastName.charAt(0)}
+                  </div>
+                )}
                 <ChevronDown className="w-3.5 h-3.5 text-rose-400 hidden md:block" />
               </button>
 

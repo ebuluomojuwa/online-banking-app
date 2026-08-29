@@ -51,6 +51,11 @@ interface BankingContextType {
   fraudAlerts: FraudAlert[];
   auditLogs: AuditLog[];
   
+  // Master lists for admin/auditing
+  allAccounts: BankAccount[];
+  allTransactions: Transaction[];
+  allCards: Card[];
+
   // Display Preferences
   hideBalances: boolean;
   theme: 'light' | 'dark' | 'system';
@@ -60,7 +65,7 @@ interface BankingContextType {
   
   // Authentication & Role Switching
   switchUser: (userId: string) => void;
-  login: (email: string, role?: UserRole) => boolean;
+  login: (identifier: string, password?: string) => { success: boolean; error?: string };
   logout: () => void;
   isAuthenticated: boolean;
 
@@ -113,7 +118,7 @@ interface BankingContextType {
 
 const BankingContext = createContext<BankingContextType | undefined>(undefined);
 
-const STORAGE_PREFIX = 'hsbc_banking_v1_';
+const STORAGE_PREFIX = 'hsbc_banking_v2_';
 
 export const BankingProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   // Load state from localStorage or use initial seed
@@ -213,9 +218,27 @@ export const BankingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     return found || allUsers[0];
   }, [allUsers, currentUserId]);
 
+  // Dynamically scoped data for the authenticated customer
+  const userAccounts = useMemo(() => accounts.filter(a => a.userId === currentUser.id), [accounts, currentUser.id]);
+  const userTransactions = useMemo(() => transactions.filter(t => t.userId === currentUser.id), [transactions, currentUser.id]);
+  const userCards = useMemo(() => cards.filter(c => c.userId === currentUser.id), [cards, currentUser.id]);
+  const userBeneficiaries = useMemo(() => beneficiaries.filter(b => b.userId === currentUser.id), [beneficiaries, currentUser.id]);
+  const userSavingsGoals = useMemo(() => savingsGoals.filter(s => s.userId === currentUser.id), [savingsGoals, currentUser.id]);
+  const userLoans = useMemo(() => loans.filter(l => l.userId === currentUser.id), [loans, currentUser.id]);
+  const userBills = useMemo(() => bills.filter(b => b.userId === currentUser.id), [bills, currentUser.id]);
+  const userNotifications = useMemo(() => notifications.filter(n => n.userId === currentUser.id), [notifications, currentUser.id]);
+  const userLoginSessions = useMemo(() => loginSessions.filter(s => s.userId === currentUser.id), [loginSessions, currentUser.id]);
+  const userSecurityEvents = useMemo(() => securityEvents.filter(s => s.userId === currentUser.id), [securityEvents, currentUser.id]);
+  const userSupportTickets = useMemo(() => 
+    currentUser.role === 'ADMIN' || currentUser.role === 'SUPPORT_AGENT'
+      ? supportTickets
+      : supportTickets.filter(t => t.userId === currentUser.id),
+    [supportTickets, currentUser.id, currentUser.role]
+  );
+
   const unreadNotificationCount = useMemo(() => {
-    return notifications.filter(n => n.userId === currentUser.id && !n.isRead).length;
-  }, [notifications, currentUser.id]);
+    return userNotifications.filter(n => !n.isRead).length;
+  }, [userNotifications]);
 
   // Dark mode effect
   const isDarkMode = useMemo(() => {
@@ -275,10 +298,10 @@ export const BankingProvider: React.FC<{ children: React.ReactNode }> = ({ child
         id: 'sec_' + Date.now(),
         userId: user.id,
         type: 'Session Active',
-        description: `Switched active demo profile to ${user.firstName} ${user.lastName} (${user.role})`,
+        description: `Switched active profile to ${user.firstName} ${user.lastName} (${user.role})`,
         ipAddress: '198.51.100.42',
-        location: 'New York, NY, USA',
-        device: 'Web Client',
+        location: `${user.address.city}, ${user.address.state}, ${user.address.country}`,
+        device: 'Web Client / Secure Portal',
         timestamp: new Date().toISOString(),
         riskLevel: 'LOW',
       };
@@ -286,23 +309,77 @@ export const BankingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
   };
 
-  const login = (email: string, role?: UserRole) => {
-    const user = allUsers.find(u => u.email.toLowerCase() === email.toLowerCase());
-    if (user) {
-      setCurrentUserId(user.id);
-      setIsAuthenticated(true);
-      return true;
+  const login = (identifier: string, password?: string): { success: boolean; error?: string } => {
+    const cleanId = identifier.trim().toLowerCase();
+    if (!cleanId) {
+      return { success: false, error: 'Please enter your username or email address.' };
     }
-    // If not found, match or switch to the closest demo profile
-    if (role === 'ADMIN' || role === 'SUPER_ADMIN') {
-      setCurrentUserId('usr_elena_rostova');
-    } else if (role === 'SUPPORT_AGENT') {
-      setCurrentUserId('usr_david_sterling');
-    } else {
-      setCurrentUserId('usr_gregorio_lind');
+
+    const user = allUsers.find(u => 
+      (u.username && u.username.toLowerCase() === cleanId) || 
+      (u.email && u.email.toLowerCase() === cleanId) ||
+      (u.customerId && u.customerId.toLowerCase() === cleanId)
+    );
+
+    if (!user) {
+      return { 
+        success: false, 
+        error: 'No account found matching this username or email. Please check your credentials.' 
+      };
     }
+
+    if (user.status === 'Suspended') {
+      return { 
+        success: false, 
+        error: 'This account has been temporarily locked by HSBC Security. Please contact Premier Support.' 
+      };
+    }
+
+    // Password verification with demo friendly tolerance
+    if (password && user.password) {
+      const isMatching = password === user.password || password === 'Password123!' || password === 'demo' || password === 'admin';
+      if (!isMatching) {
+        return { 
+          success: false, 
+          error: 'Incorrect password entered. Please check your password and try again.' 
+        };
+      }
+    }
+
+    setCurrentUserId(user.id);
     setIsAuthenticated(true);
-    return true;
+
+    const nowIso = new Date().toISOString();
+    setAllUsers(prev => prev.map(u => u.id === user.id ? { ...u, lastLogin: nowIso } : u));
+
+    // Record login session
+    const newSession: LoginSession = {
+      id: 'ses_' + Date.now(),
+      userId: user.id,
+      device: 'MacBook Pro 16" (macOS)',
+      browser: 'Google Chrome 128.0',
+      ipAddress: '198.51.100.42',
+      location: `${user.address.city}, ${user.address.state}, ${user.address.country}`,
+      lastActive: 'Just now (Active)',
+      isCurrent: true,
+    };
+    setLoginSessions(prev => [newSession, ...prev.map(s => ({ ...s, isCurrent: false }))]);
+
+    // Record security event
+    const newEvent: SecurityEvent = {
+      id: 'sec_' + Date.now(),
+      userId: user.id,
+      type: 'Successful Login',
+      description: `Authenticated via secure portal as ${user.firstName} ${user.lastName} (@${user.username || user.email})`,
+      ipAddress: '198.51.100.42',
+      location: `${user.address.city}, ${user.address.state}, ${user.address.country}`,
+      device: 'Google Chrome / macOS',
+      timestamp: nowIso,
+      riskLevel: 'LOW',
+    };
+    setSecurityEvents(prev => [newEvent, ...prev]);
+
+    return { success: true };
   };
 
   const logout = () => {
@@ -814,20 +891,23 @@ export const BankingProvider: React.FC<{ children: React.ReactNode }> = ({ child
       value={{
         currentUser,
         allUsers,
-        accounts,
-        transactions,
-        beneficiaries,
-        cards,
-        savingsGoals,
-        loans,
-        bills,
-        notifications,
+        accounts: currentUser.role === 'ADMIN' ? accounts : userAccounts,
+        transactions: currentUser.role === 'ADMIN' ? transactions : userTransactions,
+        beneficiaries: userBeneficiaries,
+        cards: currentUser.role === 'ADMIN' ? cards : userCards,
+        savingsGoals: userSavingsGoals,
+        loans: userLoans,
+        bills: userBills,
+        notifications: userNotifications,
         unreadNotificationCount,
-        loginSessions,
-        securityEvents,
-        supportTickets,
+        loginSessions: userLoginSessions,
+        securityEvents: userSecurityEvents,
+        supportTickets: userSupportTickets,
         fraudAlerts,
         auditLogs,
+        allAccounts: accounts,
+        allTransactions: transactions,
+        allCards: cards,
         hideBalances,
         theme,
         isDarkMode,
