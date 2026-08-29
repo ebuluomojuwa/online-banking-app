@@ -259,17 +259,9 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSearch, onNavigate, onGoTo
                     {currentUser.role === 'ADMIN' ? 'ADMIN COMMAND' : 'PREMIER CLIENT'}
                   </div>
                 </div>
-                {currentUser.avatarUrl ? (
-                  <img
-                    src={currentUser.avatarUrl}
-                    alt={`${currentUser.firstName} ${currentUser.lastName}`}
-                    className="w-9 h-9 rounded-xl object-cover border border-rose-400/40 shadow-xs"
-                  />
-                ) : (
-                  <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-rose-600 to-amber-600 flex items-center justify-center text-white font-bold text-xs shadow-xs border border-rose-400/30">
-                    {currentUser.firstName.charAt(0)}{currentUser.lastName.charAt(0)}
-                  </div>
-                )}
+                <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-rose-600 to-amber-600 flex items-center justify-center text-white font-bold text-xs shadow-xs border border-rose-400/30">
+                  {currentUser.firstName.charAt(0)}{currentUser.lastName.charAt(0)}
+                </div>
                 <ChevronDown className="w-3.5 h-3.5 text-rose-400 hidden md:block" />
               </button>
 
@@ -278,7 +270,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSearch, onNavigate, onGoTo
                 <div className="absolute right-0 mt-2 w-60 bg-[#200508] rounded-3xl shadow-2xl border border-[#38080E] py-3 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
                   <div className="px-5 py-2 border-b border-[#38080E]">
                     <p className="text-xs font-bold text-white">{currentUser.firstName} {currentUser.lastName}</p>
-                    <p className="text-[11px] text-rose-300/70 truncate">{currentUser.email}</p>
+                    <p className="text-[11px] text-rose-300/70 font-mono">@{currentUser.username || 'premier.client'}</p>
                     <div className="mt-2">
                       <Badge variant={currentUser.role === 'ADMIN' ? 'warning' : 'secondary'}>
                         {currentUser.role}

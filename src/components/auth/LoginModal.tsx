@@ -86,13 +86,9 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                 className="p-2 rounded-xl bg-[#0E0103] hover:bg-[#25060A] border border-[#38080E] hover:border-rose-500/50 text-left transition-all group"
               >
                 <div className="flex items-center gap-2">
-                  {u.avatarUrl ? (
-                    <img src={u.avatarUrl} alt={u.firstName} className="w-6 h-6 rounded-full object-cover border border-[#38080E]" />
-                  ) : (
-                    <div className="w-6 h-6 rounded-full bg-rose-900/60 flex items-center justify-center text-[10px] font-bold text-rose-200">
-                      {u.firstName[0]}
-                    </div>
-                  )}
+                  <div className="w-6 h-6 rounded-full bg-rose-900/60 flex items-center justify-center text-[10px] font-bold text-rose-200">
+                    {u.firstName[0]}
+                  </div>
                   <div className="min-w-0 flex-1">
                     <div className="font-bold text-rose-100 group-hover:text-white truncate text-[11px]">
                       {u.firstName} {u.lastName}

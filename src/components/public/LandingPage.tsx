@@ -146,7 +146,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenLogin, onOpenReg
               <div className="w-12 h-12 rounded-2xl bg-rose-500/20 text-rose-400 flex items-center justify-center font-bold">
                 <CreditCard className="w-6 h-6" />
               </div>
-              <h3 className="text-lg font-bold text-white">HSBC Premier Metal Cards</h3>
+              <h3 className="text-lg font-bold text-white">HSBC Premier Cards</h3>
               <p className="text-xs text-rose-300/80 leading-relaxed">
                 Precision-milled physical cards and disposable virtual card numbers with instant in-app freeze controls and NFC toggles.
               </p>

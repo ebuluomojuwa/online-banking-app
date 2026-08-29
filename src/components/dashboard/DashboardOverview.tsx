@@ -94,8 +94,8 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({ onNavigate
       name: 'Premier Checking',
       type: 'CHECKING' as const,
       currency: 'USD',
-      balance: 4000.00,
-      availableBalance: 4000.00,
+      balance: 6000.00,
+      availableBalance: 6000.00,
       pendingBalance: 0.00,
       status: 'ACTIVE' as const,
       isPrimary: true,
@@ -250,22 +250,14 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({ onNavigate
         <div className="absolute right-32 bottom-0 w-60 h-60 bg-emerald-500/5 rounded-full blur-2xl pointer-events-none" />
 
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-          {/* Customer Avatar & Bio Information */}
+          {/* Customer Bio Information */}
           <div className="flex items-start sm:items-center gap-4 sm:gap-5">
             <div className="relative shrink-0">
-              {currentUser.avatarUrl ? (
-                <img 
-                  src={currentUser.avatarUrl} 
-                  alt={`${currentUser.firstName} ${currentUser.lastName}`}
-                  className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl object-cover border-2 border-rose-500/40 shadow-md"
-                />
-              ) : (
-                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-rose-900/60 border-2 border-rose-500/40 flex items-center justify-center text-2xl font-bold text-rose-100">
-                  {currentUser.firstName[0]}{currentUser.lastName[0]}
-                </div>
-              )}
-              <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-emerald-500 rounded-full border-2 border-[#1C0407] flex items-center justify-center" title="Online & Authenticated">
-                <Check className="w-3 h-3 text-white" />
+              <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-tr from-rose-700 to-rose-950 border-2 border-rose-500/40 flex items-center justify-center text-xl font-bold text-rose-100 shadow-md">
+                {currentUser.firstName[0]}{currentUser.lastName[0]}
+              </div>
+              <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full border-2 border-[#1C0407] flex items-center justify-center" title="Online & Authenticated">
+                <Check className="w-2.5 h-2.5 text-white" />
               </div>
             </div>
 
@@ -283,31 +275,11 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({ onNavigate
                 </div>
               </div>
 
-              {/* Dynamic Username, Email, Customer ID */}
-              <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-rose-200/70">
-                <span className="font-mono text-rose-200">@{currentUser.username || currentUser.email.split('@')[0]}</span>
+              {/* Status and Username */}
+              <div className="flex items-center gap-2 text-xs text-rose-200/70">
+                <span className="font-mono text-rose-200">@{currentUser.username || 'premier.client'}</span>
                 <span className="text-rose-400/40">•</span>
-                <span className="flex items-center gap-1">
-                  <Mail className="w-3.5 h-3.5 text-rose-400/80" />
-                  {currentUser.email}
-                </span>
-                <span className="text-rose-400/40">•</span>
-                <span className="flex items-center gap-1 font-mono text-rose-300">
-                  <span>ID:</span> {currentUser.customerId || 'HSBC-CUST-849201'}
-                </span>
-              </div>
-
-              {/* Dynamic Phone & Street Address */}
-              <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-rose-300/60 pt-0.5">
-                <span className="flex items-center gap-1">
-                  <Phone className="w-3 h-3 text-rose-400/70" />
-                  {currentUser.phone}
-                </span>
-                <span className="text-rose-400/40">•</span>
-                <span className="flex items-center gap-1 truncate max-w-md">
-                  <MapPin className="w-3 h-3 text-rose-400/70 shrink-0" />
-                  {currentUser.address.street}, {currentUser.address.city}, {currentUser.address.state} {currentUser.address.postalCode}, {currentUser.address.country}
-                </span>
+                <span className="text-rose-300/80 font-medium">HSBC Premier Account Holder</span>
               </div>
             </div>
           </div>
@@ -556,7 +528,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({ onNavigate
               Customer Accounts & Portfolios
             </h3>
             <p className="text-xs text-rose-300/70">
-              Loaded dynamically for {currentUser.firstName} {currentUser.lastName} (ID: {currentUser.customerId})
+              Active Premier banking accounts and portfolios
             </p>
           </div>
           <button
