@@ -118,7 +118,7 @@ interface BankingContextType {
 
 const BankingContext = createContext<BankingContextType | undefined>(undefined);
 
-const STORAGE_PREFIX = 'hsbc_banking_v5_';
+const STORAGE_PREFIX = 'hsbc_banking_v7_';
 
 export const BankingProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   // Load state from localStorage or use initial seed

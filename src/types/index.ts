@@ -27,6 +27,7 @@ export type TransactionStatus = 'Completed' | 'Pending' | 'Failed' | 'Reversed';
 export type TransactionCategory = 
   | 'Salary' 
   | 'Income'
+  | 'Deposit'
   | 'Transfer' 
   | 'Groceries' 
   | 'Utilities' 
