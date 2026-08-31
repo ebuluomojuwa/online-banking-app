@@ -6,6 +6,7 @@ import { MobileNav } from './components/layout/MobileNav';
 import { GlobalSearchModal } from './components/common/GlobalSearchModal';
 
 // Public & Auth Views
+import { AuthGateway } from './components/auth/AuthGateway';
 import { LandingPage } from './components/public/LandingPage';
 import { LoginModal } from './components/auth/LoginModal';
 import { RegisterModal } from './components/auth/RegisterModal';
@@ -32,41 +33,82 @@ import { AdminFraudAlertsView } from './components/admin/AdminFraudAlertsView';
 import { AdminAuditLogsView } from './components/admin/AdminAuditLogsView';
 
 const BankingAppInner: React.FC = () => {
-  const { currentUser, role } = useBanking();
+  const { currentUser, role, isAuthenticated, isAuthLoading } = useBanking();
   const [currentView, setCurrentView] = useState<string>('dashboard');
   const [isLandingMode, setIsLandingMode] = useState<boolean>(false);
   const [isSearchOpen, setIsSearchOpen] = useState<boolean>(false);
   const [isLoginOpen, setIsLoginOpen] = useState<boolean>(false);
   const [isRegisterOpen, setIsRegisterOpen] = useState<boolean>(false);
 
-  // If in landing mode, show public homepage
+  // Show sleek loading state while verifying Firebase Authentication session
+  if (isAuthLoading) {
+    return (
+      <div className="min-h-screen bg-[#140204] text-[#FFF1F2] flex flex-col items-center justify-center space-y-4">
+        <div className="w-10 h-10 border-3 border-rose-500 border-t-transparent rounded-full animate-spin" />
+        <div className="text-xs text-rose-300/80 font-medium tracking-wide">
+          Verifying HSBC Secure Session...
+        </div>
+      </div>
+    );
+  }
+
+  // When unauthenticated, require user to sign in or register before getting into the app
+  if (!isAuthenticated) {
+    if (isLandingMode) {
+      return (
+        <>
+          <LandingPage
+            onOpenLogin={() => setIsLoginOpen(true)}
+            onOpenRegister={() => setIsRegisterOpen(true)}
+            onEnterDemo={() => setIsLoginOpen(true)}
+          />
+          <LoginModal
+            isOpen={isLoginOpen}
+            onClose={() => setIsLoginOpen(false)}
+            onSuccess={() => {
+              setIsLandingMode(false);
+              setCurrentView('dashboard');
+            }}
+            onSwitchToRegister={() => {
+              setIsLoginOpen(false);
+              setIsRegisterOpen(true);
+            }}
+          />
+          <RegisterModal
+            isOpen={isRegisterOpen}
+            onClose={() => setIsRegisterOpen(false)}
+            onSuccess={() => {
+              setIsLandingMode(false);
+              setCurrentView('dashboard');
+            }}
+            onSwitchToLogin={() => {
+              setIsRegisterOpen(false);
+              setIsLoginOpen(true);
+            }}
+          />
+        </>
+      );
+    }
+
+    return (
+      <AuthGateway
+        initialMode="signin"
+        onSuccess={() => {
+          setIsLandingMode(false);
+          setCurrentView('dashboard');
+        }}
+      />
+    );
+  }
+
+  // If authenticated and user clicked to view landing page
   if (isLandingMode) {
     return (
-      <>
-        <LandingPage
-          onOpenLogin={() => setIsLoginOpen(true)}
-          onOpenRegister={() => setIsRegisterOpen(true)}
-          onEnterDemo={() => setIsLandingMode(false)}
-        />
-        <LoginModal
-          isOpen={isLoginOpen}
-          onClose={() => setIsLoginOpen(false)}
-          onSuccess={() => {
-            setIsLandingMode(false);
-            setCurrentView('dashboard');
-          }}
-          onSwitchToRegister={() => setIsRegisterOpen(true)}
-        />
-        <RegisterModal
-          isOpen={isRegisterOpen}
-          onClose={() => setIsRegisterOpen(false)}
-          onSuccess={() => {
-            setIsLandingMode(false);
-            setCurrentView('dashboard');
-          }}
-          onSwitchToLogin={() => setIsLoginOpen(true)}
-        />
-      </>
+      <LandingPage
+        onOpenLogin={() => setIsLandingMode(false)}
+        onOpenRegister={() => setIsLandingMode(false)}
+        onEnterDemo={() => setIsLandingMode(false)}
+      />
     );
   }
 

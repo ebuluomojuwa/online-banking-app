@@ -1,0 +1,223 @@
+{
+  "entities": {
+    "users": {
+      "title": "User Profile",
+      "description": "User profiles, roles, contact information, preferences, and security settings",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique user ID matching auth UID or user identifier" },
+        "customerId": { "type": "string", "description": "Banking customer number" },
+        "username": { "type": "string", "description": "Unique username" },
+        "email": { "type": "string", "format": "email", "description": "User email address" },
+        "firstName": { "type": "string", "description": "User first name" },
+        "lastName": { "type": "string", "description": "User last name" },
+        "role": { "type": "string", "enum": ["CUSTOMER", "SUPPORT_AGENT", "ADMIN", "SUPER_ADMIN"], "description": "Role determining access levels" },
+        "phone": { "type": "string", "description": "User phone number" },
+        "status": { "type": "string", "enum": ["Active", "Suspended", "Pending Verification"], "description": "User account status" },
+        "twoFactorEnabled": { "type": "boolean", "description": "Whether 2FA is active" },
+        "biometricsEnabled": { "type": "boolean", "description": "Whether biometric sign-in is active" },
+        "securityScore": { "type": "number", "description": "Account security rating percentage" },
+        "createdAt": { "type": "string", "description": "ISO timestamp of registration" },
+        "lastLogin": { "type": "string", "description": "ISO timestamp of most recent login" }
+      },
+      "required": ["id", "email", "firstName", "lastName", "role"]
+    },
+    "accounts": {
+      "title": "Bank Account",
+      "description": "Checking, savings, business, and investment bank accounts",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique account ID" },
+        "userId": { "type": "string", "description": "Owner user ID" },
+        "name": { "type": "string", "description": "Account display name" },
+        "accountNumber": { "type": "string", "description": "Last 4 digits or account number" },
+        "routingNumber": { "type": "string", "description": "Routing transit number" },
+        "iban": { "type": "string", "description": "IBAN code" },
+        "swift": { "type": "string", "description": "SWIFT/BIC code" },
+        "type": { "type": "string", "enum": ["CHECKING", "SAVINGS", "CREDIT", "BUSINESS", "INVESTMENT"], "description": "Account type" },
+        "currency": { "type": "string", "description": "Currency code" },
+        "balance": { "type": "number", "description": "Current ledger balance" },
+        "availableBalance": { "type": "number", "description": "Available funds" },
+        "pendingBalance": { "type": "number", "description": "Pending deposits/holds" },
+        "status": { "type": "string", "enum": ["ACTIVE", "FROZEN", "DORMANT", "CLOSED"], "description": "Account status" },
+        "isPrimary": { "type": "boolean", "description": "Primary account flag" },
+        "interestRate": { "type": "number", "description": "Annual percentage yield / interest" },
+        "createdAt": { "type": "string", "description": "ISO timestamp of account opening" }
+      },
+      "required": ["id", "userId", "name", "accountNumber", "type", "currency", "balance", "status"]
+    },
+    "transactions": {
+      "title": "Transaction Record",
+      "description": "Financial ledger transactions including deposits, transfers, purchases, and bill payments",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Transaction identifier" },
+        "userId": { "type": "string", "description": "User identifier" },
+        "accountId": { "type": "string", "description": "Associated bank account ID" },
+        "accountName": { "type": "string", "description": "Account display name" },
+        "description": { "type": "string", "description": "Transaction narrative" },
+        "merchantName": { "type": "string", "description": "Merchant or counterparty name" },
+        "category": { "type": "string", "description": "Spending or income category" },
+        "amount": { "type": "number", "description": "Transaction amount (positive credit, negative debit)" },
+        "currency": { "type": "string", "description": "Currency code" },
+        "status": { "type": "string", "enum": ["Completed", "Pending", "Failed", "Reversed"], "description": "Transaction lifecycle state" },
+        "date": { "type": "string", "description": "ISO timestamp of transaction" },
+        "reference": { "type": "string", "description": "Banking transfer reference code" },
+        "recipientOrSender": { "type": "string", "description": "Counterparty details" },
+        "fee": { "type": "number", "description": "Transaction processing fee" },
+        "riskScore": { "type": "string", "enum": ["Low", "Medium", "High"], "description": "Fraud risk score" },
+        "note": { "type": "string", "description": "User custom note" }
+      },
+      "required": ["id", "userId", "accountId", "description", "category", "amount", "currency", "status", "date"]
+    },
+    "cards": {
+      "title": "Payment Card",
+      "description": "Debit, credit, and virtual banking cards with security controls",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Card identifier" },
+        "userId": { "type": "string", "description": "Cardholder user ID" },
+        "accountId": { "type": "string", "description": "Linked bank account ID" },
+        "cardNumber": { "type": "string", "description": "Masked card number" },
+        "fullMaskedNumber": { "type": "string", "description": "Full masked card display" },
+        "cardholderName": { "type": "string", "description": "Name printed on card" },
+        "expiryMonth": { "type": "string", "description": "Expiry month" },
+        "expiryYear": { "type": "string", "description": "Expiry year" },
+        "cvv": { "type": "string", "description": "Security code" },
+        "cardType": { "type": "string", "enum": ["DEBIT", "CREDIT", "VIRTUAL"], "description": "Card type" },
+        "tier": { "type": "string", "description": "Card tier branding" },
+        "status": { "type": "string", "enum": ["ACTIVE", "FROZEN", "BLOCKED", "EXPIRED"], "description": "Card status" },
+        "spendingLimit": { "type": "number", "description": "Monthly spending limit" },
+        "monthlySpent": { "type": "number", "description": "Current month spending" },
+        "colorTheme": { "type": "string", "description": "Visual theme" },
+        "createdAt": { "type": "string", "description": "ISO timestamp of issuance" }
+      },
+      "required": ["id", "userId", "accountId", "cardNumber", "cardholderName", "cardType", "status"]
+    },
+    "beneficiaries": {
+      "title": "Transfer Beneficiary",
+      "description": "Saved payees and recipients for wire, ACH, and internal transfers",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Beneficiary identifier" },
+        "userId": { "type": "string", "description": "Owner user ID" },
+        "name": { "type": "string", "description": "Recipient full name" },
+        "bankName": { "type": "string", "description": "Recipient institution" },
+        "accountNumber": { "type": "string", "description": "Recipient account number" },
+        "nickname": { "type": "string", "description": "User designated label" },
+        "country": { "type": "string", "description": "Country of beneficiary" },
+        "currency": { "type": "string", "description": "Beneficiary currency" },
+        "routingOrSwift": { "type": "string", "description": "Routing or SWIFT code" },
+        "isFavorite": { "type": "boolean", "description": "Starred favorite payee" },
+        "createdAt": { "type": "string", "description": "ISO timestamp created" }
+      },
+      "required": ["id", "userId", "name", "bankName", "accountNumber"]
+    },
+    "savingsGoals": {
+      "title": "Savings Goal",
+      "description": "Dedicated financial targets and auto-save allocation vaults",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Goal identifier" },
+        "userId": { "type": "string", "description": "Owner user ID" },
+        "name": { "type": "string", "description": "Goal name" },
+        "targetAmount": { "type": "number", "description": "Target savings dollar amount" },
+        "currentAmount": { "type": "number", "description": "Current accumulated savings" },
+        "targetDate": { "type": "string", "description": "Target completion date" },
+        "category": { "type": "string", "description": "Goal category" },
+        "color": { "type": "string", "description": "Theme accent color" },
+        "icon": { "type": "string", "description": "Icon identifier" },
+        "autoSaveEnabled": { "type": "boolean", "description": "Automated monthly recurring transfer flag" },
+        "autoSaveMonthlyAmount": { "type": "number", "description": "Monthly recurring auto-save amount" },
+        "createdAt": { "type": "string", "description": "ISO timestamp created" }
+      },
+      "required": ["id", "userId", "name", "targetAmount", "currentAmount"]
+    },
+    "billPayments": {
+      "title": "Bill Payment",
+      "description": "Utility, telecom, insurance, and subscription billing schedules",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Bill identifier" },
+        "userId": { "type": "string", "description": "Owner user ID" },
+        "billerName": { "type": "string", "description": "Company name" },
+        "billerCategory": { "type": "string", "description": "Utility or service category" },
+        "accountNumber": { "type": "string", "description": "Customer biller account number" },
+        "amountDue": { "type": "number", "description": "Outstanding amount" },
+        "dueDate": { "type": "string", "description": "Payment due date" },
+        "status": { "type": "string", "enum": ["PAID", "DUE", "OVERDUE", "SCHEDULED"], "description": "Bill payment status" },
+        "autoPay": { "type": "boolean", "description": "Autopay enabled flag" }
+      },
+      "required": ["id", "userId", "billerName", "amountDue", "dueDate", "status"]
+    },
+    "notifications": {
+      "title": "Notification Item",
+      "description": "Security alerts, transfer confirmations, and system notifications",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Notification identifier" },
+        "userId": { "type": "string", "description": "Target user ID" },
+        "title": { "type": "string", "description": "Notification headline" },
+        "message": { "type": "string", "description": "Notification message body" },
+        "type": { "type": "string", "description": "Alert category" },
+        "isRead": { "type": "boolean", "description": "Read status" },
+        "createdAt": { "type": "string", "description": "ISO timestamp" }
+      },
+      "required": ["id", "userId", "title", "message", "isRead", "createdAt"]
+    },
+    "supportTickets": {
+      "title": "Support Ticket",
+      "description": "Customer service inquiries and concierge chat cases",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Ticket identifier" },
+        "userId": { "type": "string", "description": "Requester user ID" },
+        "userName": { "type": "string", "description": "Customer name" },
+        "userEmail": { "type": "string", "description": "Customer email" },
+        "subject": { "type": "string", "description": "Issue summary" },
+        "category": { "type": "string", "description": "Department category" },
+        "status": { "type": "string", "enum": ["Open", "In Progress", "Waiting for Customer", "Resolved", "Closed"], "description": "Ticket status" },
+        "priority": { "type": "string", "enum": ["Low", "Medium", "High", "Urgent"], "description": "Priority tier" },
+        "createdAt": { "type": "string", "description": "ISO timestamp created" },
+        "updatedAt": { "type": "string", "description": "ISO timestamp updated" },
+        "messages": { "type": "array", "description": "Chat transcript messages" }
+      },
+      "required": ["id", "userId", "subject", "status", "priority", "createdAt"]
+    },
+    "fraudAlerts": {
+      "title": "Fraud Alert",
+      "description": "Security and compliance risk alerts",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Alert identifier" },
+        "userId": { "type": "string", "description": "Flagged user ID" },
+        "userName": { "type": "string", "description": "User name" },
+        "userEmail": { "type": "string", "description": "User email" },
+        "title": { "type": "string", "description": "Alert headline" },
+        "description": { "type": "string", "description": "Risk details" },
+        "riskLevel": { "type": "string", "enum": ["Low", "Medium", "High", "Critical"], "description": "Risk level" },
+        "timestamp": { "type": "string", "description": "ISO timestamp" },
+        "status": { "type": "string", "enum": ["Active", "Under Investigation", "Resolved", "Dismissed"], "description": "Investigation status" },
+        "recommendedAction": { "type": "string", "description": "Action guidance" }
+      },
+      "required": ["id", "userId", "title", "riskLevel", "status", "timestamp"]
+    },
+    "auditLogs": {
+      "title": "Audit Log",
+      "description": "Immutable security and administrative compliance action logs",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Log identifier" },
+        "actorId": { "type": "string", "description": "Actor user ID" },
+        "actorName": { "type": "string", "description": "Actor display name" },
+        "actorRole": { "type": "string", "description": "Role of actor" },
+        "action": { "type": "string", "description": "Action performed" },
+        "details": { "type": "string", "description": "Detailed log description" },
+        "targetEntity": { "type": "string", "description": "Target resource" },
+        "timestamp": { "type": "string", "description": "ISO timestamp" },
+        "ipAddress": { "type": "string", "description": "Origin IP address" }
+      },
+      "required": ["id", "actorId", "actorName", "action", "timestamp"]
+    }
+  }
+}

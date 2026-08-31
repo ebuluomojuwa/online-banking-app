@@ -85,22 +85,22 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({ onNavigate
 
   const primaryAccount = useMemo(() => {
     return userAccounts.find(a => a.isPrimary) || userAccounts[0] || {
-      id: 'acc_default',
+      id: 'acc_none',
       userId: currentUser.id,
-      accountNumber: '4821',
+      accountNumber: '••••',
       routingNumber: '021000089',
-      iban: 'US89HSBC02100008948214490',
-      swift: 'HSBCUS33',
+      iban: '••••',
+      swift: 'HBUKGB41400',
       name: 'Premier Checking',
       type: 'CHECKING' as const,
       currency: 'USD',
-      balance: 6000.00,
-      availableBalance: 6000.00,
+      balance: 0.00,
+      availableBalance: 0.00,
       pendingBalance: 0.00,
       status: 'ACTIVE' as const,
       isPrimary: true,
-      interestRate: 0.85,
-      createdAt: '2023-01-15T08:00:00Z',
+      interestRate: 0.005,
+      createdAt: new Date().toISOString(),
     };
   }, [userAccounts, currentUser.id]);
 

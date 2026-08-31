@@ -45,7 +45,7 @@ export const ProfileSettingsView: React.FC = () => {
       {/* Profile Overview Card */}
       <div className="bg-[#1C0407] p-6 sm:p-8 rounded-3xl border border-[#38080E] shadow-sm flex flex-col sm:flex-row items-center gap-6">
         <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-rose-600 to-amber-600 flex items-center justify-center text-white text-xl font-bold border border-rose-400/40 shadow-md">
-          {currentUser.firstName.charAt(0)}{currentUser.lastName.charAt(0)}
+          {(currentUser.firstName || 'P').charAt(0)}{(currentUser.lastName || 'C').charAt(0)}
         </div>
 
         <div className="space-y-1 text-center sm:text-left flex-1">
@@ -59,7 +59,7 @@ export const ProfileSettingsView: React.FC = () => {
           </div>
           <p className="text-xs text-zinc-500">{currentUser.email}</p>
           <div className="text-[11px] text-zinc-400 pt-1">
-            Member Since: {new Date(currentUser.memberSince).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })} • Customer ID: #NV-{currentUser.id.slice(0, 6).toUpperCase()}
+            Member Since: {new Date(currentUser.memberSince || currentUser.createdAt || Date.now()).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })} • Customer ID: #{currentUser.customerId || (currentUser.id ? currentUser.id.slice(0, 6).toUpperCase() : 'HSBC-PREMIER')}
           </div>
         </div>
       </div>

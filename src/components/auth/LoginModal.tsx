@@ -3,11 +3,9 @@ import {
   Lock, 
   User, 
   ShieldCheck, 
-  Sparkles, 
   ArrowRight, 
   Eye,
-  EyeOff,
-  CheckCircle2,
+  EyeOff, 
   AlertCircle
 } from 'lucide-react';
 import { useBanking } from '../../context/BankingContext';
@@ -26,20 +24,20 @@ export const LoginModal: React.FC<LoginModalProps> = ({
   onSuccess,
   onSwitchToRegister,
 }) => {
-  const { allUsers, login, switchUser } = useBanking();
-  const [identifier, setIdentifier] = useState('gregoriolind');
-  const [password, setPassword] = useState('Password123!');
+  const { login } = useBanking();
+  const [identifier, setIdentifier] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError('');
 
-    setTimeout(() => {
-      const result = login(identifier, password);
+    try {
+      const result = await login(identifier, password);
       if (result.success) {
         setIsLoading(false);
         onSuccess();
@@ -48,16 +46,9 @@ export const LoginModal: React.FC<LoginModalProps> = ({
         setIsLoading(false);
         setError(result.error || 'Invalid credentials. Please try again.');
       }
-    }, 450);
-  };
-
-  const handleQuickPersona = (user: typeof allUsers[0]) => {
-    setIdentifier(user.username || user.email);
-    setPassword(user.password || 'Password123!');
-    const result = login(user.username || user.email, user.password || 'Password123!');
-    if (result.success) {
-      onSuccess();
-      onClose();
+    } catch (err: any) {
+      setIsLoading(false);
+      setError(err?.message || 'Login failed. Please check your credentials.');
     }
   };
 
@@ -69,40 +60,6 @@ export const LoginModal: React.FC<LoginModalProps> = ({
       description="Enter your username or email address and password to access your personalized customer dashboard."
     >
       <div className="space-y-4 text-xs">
-        {/* Quick Demo Persona Access */}
-        <div className="p-3.5 bg-[#1C0407] rounded-2xl border border-[#38080E] space-y-2.5">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1.5 text-rose-300/80 font-bold text-[11px]">
-              <Sparkles className="w-3.5 h-3.5 text-emerald-400" /> One-Click Customer Sign In:
-            </div>
-            <span className="text-[10px] text-rose-400/60 font-mono">Password: Password123!</span>
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-            {allUsers.slice(0, 6).map(u => (
-              <button
-                key={u.id}
-                type="button"
-                onClick={() => handleQuickPersona(u)}
-                className="p-2 rounded-xl bg-[#0E0103] hover:bg-[#25060A] border border-[#38080E] hover:border-rose-500/50 text-left transition-all group"
-              >
-                <div className="flex items-center gap-2">
-                  <div className="w-6 h-6 rounded-full bg-rose-900/60 flex items-center justify-center text-[10px] font-bold text-rose-200">
-                    {u.firstName[0]}
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <div className="font-bold text-rose-100 group-hover:text-white truncate text-[11px]">
-                      {u.firstName} {u.lastName}
-                    </div>
-                    <div className="text-[9px] text-rose-400/70 truncate">
-                      @{u.username || u.email.split('@')[0]}
-                    </div>
-                  </div>
-                </div>
-              </button>
-            ))}
-          </div>
-        </div>
-
         {error && (
           <div className="p-3 rounded-xl bg-rose-950/80 text-rose-300 border border-rose-800/80 flex items-center gap-2">
             <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />

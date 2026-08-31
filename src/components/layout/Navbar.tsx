@@ -14,7 +14,10 @@ import {
   CheckCircle2,
   AlertTriangle,
   HelpCircle,
-  Sparkles
+  Sparkles,
+  Database,
+  RefreshCw,
+  Check
 } from 'lucide-react';
 import { useBanking } from '../../context/BankingContext';
 import { Badge } from '../ui';
@@ -43,12 +46,25 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSearch, onNavigate, onGoTo
     unreadNotificationCount,
     markNotificationRead,
     markAllNotificationsRead,
-    resetAllDemoData
+    resetAllDemoData,
+    syncToFirestoreNow
   } = useBanking();
 
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showNotifMenu, setShowNotifMenu] = useState(false);
   const [showRoleSwitcher, setShowRoleSwitcher] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [syncSuccessMessage, setSyncSuccessMessage] = useState('');
+
+  const handleManualSync = async () => {
+    setIsSyncing(true);
+    const res = await syncToFirestoreNow();
+    setIsSyncing(false);
+    if (res.success) {
+      setSyncSuccessMessage(`Synced ${res.totalSynced} items`);
+      setTimeout(() => setSyncSuccessMessage(''), 3000);
+    }
+  };
 
   const recentNotifications = notifications.slice(0, 4);
 
@@ -71,6 +87,30 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSearch, onNavigate, onGoTo
           </div>
 
           <div className="flex items-center gap-3">
+            <button
+              onClick={handleManualSync}
+              disabled={isSyncing}
+              className="text-[11px] font-medium text-rose-200 hover:text-emerald-300 transition-colors flex items-center gap-1 bg-[#1C0407] hover:bg-[#25060A] px-2 py-0.5 rounded-lg border border-rose-800/40"
+              title="Push all database collections to Firebase Cloud Firestore"
+            >
+              {isSyncing ? (
+                <>
+                  <RefreshCw className="w-3 h-3 text-emerald-400 animate-spin" />
+                  <span className="text-emerald-300">Syncing to Firebase...</span>
+                </>
+              ) : syncSuccessMessage ? (
+                <>
+                  <Check className="w-3 h-3 text-emerald-400" />
+                  <span className="text-emerald-300 font-bold">{syncSuccessMessage}</span>
+                </>
+              ) : (
+                <>
+                  <Database className="w-3 h-3 text-rose-400" />
+                  <span>Sync to Firebase</span>
+                </>
+              )}
+            </button>
+            <div className="h-3 w-px bg-[#38080E]" />
             <button
               onClick={resetAllDemoData}
               className="text-[11px] text-rose-300/70 hover:text-white transition-colors underline underline-offset-2 flex items-center gap-1"
@@ -253,14 +293,14 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSearch, onNavigate, onGoTo
               >
                 <div className="text-right hidden sm:block">
                   <div className="text-sm font-semibold text-white leading-tight">
-                    {currentUser.firstName} {currentUser.lastName}
+                    {(currentUser.firstName || 'Premier')} {(currentUser.lastName || 'Client')}
                   </div>
                   <div className="text-[10px] text-rose-300/70 font-bold uppercase tracking-wider">
                     {currentUser.role === 'ADMIN' ? 'ADMIN COMMAND' : 'PREMIER CLIENT'}
                   </div>
                 </div>
                 <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-rose-600 to-amber-600 flex items-center justify-center text-white font-bold text-xs shadow-xs border border-rose-400/30">
-                  {currentUser.firstName.charAt(0)}{currentUser.lastName.charAt(0)}
+                  {(currentUser.firstName || 'P').charAt(0)}{(currentUser.lastName || 'C').charAt(0)}
                 </div>
                 <ChevronDown className="w-3.5 h-3.5 text-rose-400 hidden md:block" />
               </button>
