@@ -195,6 +195,9 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
               placeholder="name@example.com"
               value={email}
               onChange={e => setEmail(e.target.value)}
+              autoCapitalize="none"
+              autoCorrect="off"
+              spellCheck={false}
               className="w-full p-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white"
             />
             <span className="text-[10px] text-zinc-500 dark:text-zinc-400">A 6-digit OTP code will be sent to this email address.</span>

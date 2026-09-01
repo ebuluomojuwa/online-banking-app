@@ -136,22 +136,41 @@ export async function getUserProfileFromFirestore(userId: string): Promise<UserP
 }
 
 export async function findUserByEmailOrUsername(identifier: string): Promise<UserProfile | null> {
-  const cleanId = identifier.trim().toLowerCase();
+  const trimmed = identifier.trim();
+  const cleanLower = trimmed.toLowerCase();
   try {
-    if (cleanId.includes('@')) {
-      const q = query(collection(db, 'users'), where('email', '==', cleanId), limit(1));
-      const snap = await getDocs(q);
-      if (!snap.empty) {
-        return snap.docs[0].data() as UserProfile;
+    if (trimmed.includes('@')) {
+      // 1. Try lowercase email match
+      const qLower = query(collection(db, 'users'), where('email', '==', cleanLower), limit(1));
+      const snapLower = await getDocs(qLower);
+      if (!snapLower.empty) {
+        return snapLower.docs[0].data() as UserProfile;
+      }
+      // 2. Try raw email match if different from lower
+      if (trimmed !== cleanLower) {
+        const qRaw = query(collection(db, 'users'), where('email', '==', trimmed), limit(1));
+        const snapRaw = await getDocs(qRaw);
+        if (!snapRaw.empty) {
+          return snapRaw.docs[0].data() as UserProfile;
+        }
       }
     } else {
-      const q = query(collection(db, 'users'), where('username', '==', cleanId), limit(1));
-      const snap = await getDocs(q);
-      if (!snap.empty) {
-        return snap.docs[0].data() as UserProfile;
+      // 1. Try lowercase username match
+      const qUserLower = query(collection(db, 'users'), where('username', '==', cleanLower), limit(1));
+      const snapUserLower = await getDocs(qUserLower);
+      if (!snapUserLower.empty) {
+        return snapUserLower.docs[0].data() as UserProfile;
       }
-      // Also check customerId
-      const qCust = query(collection(db, 'users'), where('customerId', '==', identifier.trim()), limit(1));
+      // 2. Try raw username match
+      if (trimmed !== cleanLower) {
+        const qUserRaw = query(collection(db, 'users'), where('username', '==', trimmed), limit(1));
+        const snapUserRaw = await getDocs(qUserRaw);
+        if (!snapUserRaw.empty) {
+          return snapUserRaw.docs[0].data() as UserProfile;
+        }
+      }
+      // 3. Try customerId match
+      const qCust = query(collection(db, 'users'), where('customerId', '==', trimmed), limit(1));
       const snapCust = await getDocs(qCust);
       if (!snapCust.empty) {
         return snapCust.docs[0].data() as UserProfile;

@@ -257,6 +257,9 @@ export const AuthGateway: React.FC<AuthGatewayProps> = ({
                       onChange={e => setIdentifier(e.target.value)}
                       placeholder="e.g. gregoriolind or name@example.com"
                       required
+                      autoCapitalize="none"
+                      autoCorrect="off"
+                      spellCheck={false}
                       className="w-full pl-9 pr-4 py-2.5 bg-[#0E0103] border border-[#38080E] rounded-xl text-white placeholder-rose-400/40 focus:outline-none focus:border-rose-500 text-xs transition-colors"
                     />
                   </div>
@@ -446,6 +449,9 @@ export const AuthGateway: React.FC<AuthGatewayProps> = ({
                           placeholder="julian.thorne@example.com"
                           value={regEmail}
                           onChange={e => setRegEmail(e.target.value)}
+                          autoCapitalize="none"
+                          autoCorrect="off"
+                          spellCheck={false}
                           className="w-full pl-9 pr-4 py-2.5 bg-[#0E0103] border border-[#38080E] rounded-xl text-white placeholder-rose-400/40 focus:outline-none focus:border-rose-500 text-xs"
                         />
                       </div>
@@ -463,6 +469,9 @@ export const AuthGateway: React.FC<AuthGatewayProps> = ({
                           placeholder="e.g. julianthorne"
                           value={regUsername}
                           onChange={e => setRegUsername(e.target.value)}
+                          autoCapitalize="none"
+                          autoCorrect="off"
+                          spellCheck={false}
                           className="w-full p-2.5 bg-[#0E0103] border border-[#38080E] rounded-xl text-white placeholder-rose-400/40 focus:outline-none focus:border-rose-500 text-xs"
                         />
                       </div>
