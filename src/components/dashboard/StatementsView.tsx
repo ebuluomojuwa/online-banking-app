@@ -11,7 +11,7 @@ import {
   ArrowDownLeft, 
   ArrowUpRight 
 } from 'lucide-react';
-import { useBanking } from '../../context/BankingContext';
+import { useBanking, isWelcomeCreditTransaction } from '../../context/BankingContext';
 import { Badge, Modal } from '../ui';
 import { HsbcLogo } from '../common/HsbcLogo';
 
@@ -33,7 +33,11 @@ export const StatementsView: React.FC = () => {
     { id: 'stmt-2026-04', month: 'April 2026', period: 'Apr 01, 2026 - Apr 30, 2026', size: '304 KB' },
   ];
 
-  const relevantTransactions = transactions.filter(t => t.userId === currentUser.id && (selectedAccountId ? t.accountId === selectedAccountId : true));
+  const relevantTransactions = transactions.filter(t => 
+    !isWelcomeCreditTransaction(t) && 
+    t.userId === currentUser.id && 
+    (selectedAccountId ? t.accountId === selectedAccountId : true)
+  );
 
   const totalInflow = relevantTransactions.filter(t => t.amount > 0).reduce((s, t) => s + t.amount, 0);
   const totalOutflow = relevantTransactions.filter(t => t.amount < 0).reduce((s, t) => s + Math.abs(t.amount), 0);

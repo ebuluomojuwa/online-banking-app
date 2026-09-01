@@ -14,7 +14,7 @@ import {
   Clock
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
-import { useBanking } from '../../context/BankingContext';
+import { useBanking, isPrimaryAccount } from '../../context/BankingContext';
 import { Badge, Modal } from '../ui';
 
 export const TransfersView: React.FC = () => {
@@ -64,6 +64,10 @@ export const TransfersView: React.FC = () => {
     return accounts.find(a => a.id === fromAccountId) || userAccounts[0];
   }, [accounts, fromAccountId, userAccounts]);
 
+  const isSourcePrimary = useMemo(() => {
+    return isPrimaryAccount(selectedSourceAccount);
+  }, [selectedSourceAccount]);
+
   const numAmount = parseFloat(amount) || 0;
 
   // Determine recipient display name and account
@@ -98,6 +102,10 @@ export const TransfersView: React.FC = () => {
     }
     if (numAmount <= 0) {
       setErrorMessage('Transfer amount must be greater than $0.00');
+      return;
+    }
+    if (isSourcePrimary && numAmount < 50000) {
+      setErrorMessage('Minimum daily withdrawal amount for your primary account is $50,000.00 USD. (Maximum daily withdrawal is Unlimited)');
       return;
     }
     if (selectedSourceAccount.availableBalance < numAmount) {
@@ -207,7 +215,39 @@ export const TransfersView: React.FC = () => {
       </div>
 
       {/* Main Transfer Form Card */}
-      <div className="bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200/80 dark:border-zinc-800 shadow-sm p-6 sm:p-8">
+      <div className="bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200/80 dark:border-zinc-800 shadow-sm p-6 sm:p-8 space-y-6">
+        {/* Primary Account Daily Withdrawal Policy Banner */}
+        {isSourcePrimary && (
+          <div className="p-4 rounded-2xl bg-zinc-950 dark:bg-zinc-800 text-white dark:text-zinc-100 border border-zinc-800 dark:border-zinc-700 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-sm">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-zinc-800 dark:bg-zinc-700 flex items-center justify-center text-white shrink-0">
+                <ShieldCheck className="w-5 h-5 text-emerald-400" />
+              </div>
+              <div>
+                <div className="text-xs font-bold flex items-center gap-2">
+                  <span>Primary Account Withdrawal Rules</span>
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                    Enforced
+                  </span>
+                </div>
+                <p className="text-[11px] text-zinc-400 mt-0.5">
+                  Daily withdrawal thresholds configured for institutional and high-value treasury operations.
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-4 text-xs shrink-0 border-t sm:border-t-0 sm:border-l border-zinc-800 dark:border-zinc-700 pt-2 sm:pt-0 sm:pl-4">
+              <div>
+                <span className="text-[10px] uppercase font-bold text-zinc-400 block">Min Daily Withdrawal</span>
+                <span className="font-bold text-emerald-400 font-mono">$50,000.00 USD</span>
+              </div>
+              <div>
+                <span className="text-[10px] uppercase font-bold text-zinc-400 block">Max Daily Withdrawal</span>
+                <span className="font-bold text-white font-mono">Unlimited</span>
+              </div>
+            </div>
+          </div>
+        )}
+
         <form onSubmit={handleOpenReview} className="space-y-6">
           {errorMessage && (
             <div className="p-4 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-400 text-xs flex items-center gap-2">
@@ -320,16 +360,25 @@ export const TransfersView: React.FC = () => {
           {/* Amount & Currency */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
             <div className="md:col-span-2 space-y-2">
-              <label className="block text-xs font-bold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">
-                Transfer Amount ($ USD)
-              </label>
+              <div className="flex items-center justify-between">
+                <label className="block text-xs font-bold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">
+                  Transfer Amount ($ USD)
+                </label>
+                {isSourcePrimary ? (
+                  <span className="text-[11px] font-semibold text-zinc-600 dark:text-zinc-300">
+                    Min: <strong className="text-emerald-600 dark:text-emerald-400 font-mono">$50,000.00</strong> • Max: <strong className="text-zinc-900 dark:text-white">Unlimited</strong>
+                  </span>
+                ) : (
+                  <span className="text-[11px] text-zinc-400">Min: $1.00</span>
+                )}
+              </div>
               <div className="relative">
                 <span className="absolute left-4 top-3 text-lg font-bold text-zinc-400">$</span>
                 <input
                   type="number"
                   step="0.01"
-                  min="1"
-                  placeholder="0.00"
+                  min={isSourcePrimary ? "50000" : "1"}
+                  placeholder={isSourcePrimary ? "50000.00" : "0.00"}
                   value={amount}
                   onChange={e => setAmount(e.target.value)}
                   className="w-full pl-9 pr-4 py-3 bg-zinc-50 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 text-lg font-bold rounded-xl text-zinc-900 dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-white"
@@ -337,15 +386,15 @@ export const TransfersView: React.FC = () => {
               </div>
 
               {/* Quick Amount Buttons */}
-              <div className="flex items-center gap-2 pt-1">
-                {[100, 500, 1000, 2500, 5000].map(val => (
+              <div className="flex items-center flex-wrap gap-2 pt-1">
+                {(isSourcePrimary ? [50000, 75000, 100000, 250000, 500000] : [100, 500, 1000, 2500, 5000]).map(val => (
                   <button
                     type="button"
                     key={val}
                     onClick={() => setAmount(val.toString())}
-                    className="px-2.5 py-1 text-[11px] font-semibold rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200"
+                    className="px-2.5 py-1 text-[11px] font-semibold rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors"
                   >
-                    +${val}
+                    +${val.toLocaleString()}
                   </button>
                 ))}
               </div>
@@ -444,6 +493,13 @@ export const TransfersView: React.FC = () => {
               <div className="flex justify-between py-1 border-b border-zinc-200/60 dark:border-zinc-700">
                 <span className="text-zinc-500">Transfer Type:</span>
                 <Badge variant="neutral">{transferType}</Badge>
+              </div>
+
+              <div className="flex justify-between py-1 border-b border-zinc-200/60 dark:border-zinc-700">
+                <span className="text-zinc-500">Daily Withdrawal Policy:</span>
+                <strong className="text-zinc-900 dark:text-white">
+                  {isSourcePrimary ? 'Min $50,000.00 USD • Max Unlimited' : 'Standard Tier'}
+                </strong>
               </div>
 
               <div className="flex justify-between py-1 border-b border-zinc-200/60 dark:border-zinc-700">

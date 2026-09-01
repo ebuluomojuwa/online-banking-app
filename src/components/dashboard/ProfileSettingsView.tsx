@@ -3,17 +3,18 @@ import {
   User, 
   Mail, 
   Phone, 
-  MapPin, 
   ShieldCheck, 
   RotateCcw, 
   CheckCircle2, 
   Sparkles,
-  Sliders,
-  DollarSign,
-  Globe
+  Lock,
+  Key,
+  Calendar,
+  AlertCircle
 } from 'lucide-react';
 import { useBanking } from '../../context/BankingContext';
 import { Badge } from '../ui';
+import { ChangePasswordForm } from './ChangePasswordForm';
 
 export const ProfileSettingsView: React.FC = () => {
   const { currentUser, switchUser, users, resetAllData } = useBanking();
@@ -34,11 +35,11 @@ export const ProfileSettingsView: React.FC = () => {
     <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in duration-300">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-white">
-          Client Profile & Preferences
+        <h1 className="text-2xl font-bold tracking-tight text-white">
+          Account Settings & Security
         </h1>
-        <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
-          Manage personal contact records, KYC compliance status, and simulation personas
+        <p className="text-xs text-rose-300/70 mt-1">
+          Manage your personal profile records, change portal security credentials, and KYC status
         </p>
       </div>
 
@@ -50,29 +51,129 @@ export const ProfileSettingsView: React.FC = () => {
 
         <div className="space-y-1 text-center sm:text-left flex-1">
           <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
-            <h2 className="text-lg font-bold text-zinc-900 dark:text-white">
+            <h2 className="text-lg font-bold text-white">
               {currentUser.firstName} {currentUser.lastName}
             </h2>
             <Badge variant="success">
               <ShieldCheck className="w-3.5 h-3.5 mr-1 inline" /> KYC Verified Level 3
             </Badge>
           </div>
-          <p className="text-xs text-zinc-500">{currentUser.email}</p>
-          <div className="text-[11px] text-zinc-400 pt-1">
+          <p className="text-xs text-rose-300/80">{currentUser.email}</p>
+          <div className="text-[11px] text-rose-400/70 pt-1">
             Member Since: {new Date(currentUser.memberSince || currentUser.createdAt || Date.now()).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })} • Customer ID: #{currentUser.customerId || (currentUser.id ? currentUser.id.slice(0, 6).toUpperCase() : 'HSBC-PREMIER')}
           </div>
         </div>
       </div>
 
+      {/* Change Password Card */}
+      <div id="change-password-section" className="bg-[#1C0407] rounded-3xl border border-[#38080E] shadow-sm p-6 sm:p-8 space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-[#38080E]">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-400 flex items-center justify-center">
+              <Lock className="w-5 h-5" />
+            </div>
+            <div>
+              <h3 className="text-sm font-bold text-white">
+                Change Account Password
+              </h3>
+              <p className="text-xs text-rose-300/70">
+                Update your login password securely through Firebase Authentication
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 text-[11px] text-rose-300/70 bg-[#0E0103] px-3 py-1.5 rounded-xl border border-[#38080E] self-start sm:self-auto">
+            <Key className="w-3.5 h-3.5 text-rose-400" />
+            <span>Encrypted Authentication</span>
+          </div>
+        </div>
+
+        <ChangePasswordForm />
+      </div>
+
+      {/* Edit Personal Details Form */}
+      <form onSubmit={handleSaveProfile} className="bg-[#1C0407] rounded-3xl border border-[#38080E] shadow-sm p-6 sm:p-8 space-y-6">
+        <div className="flex items-center gap-3 pb-2 border-b border-[#38080E]">
+          <div className="w-10 h-10 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-400 flex items-center justify-center">
+            <User className="w-5 h-5" />
+          </div>
+          <div>
+            <h3 className="text-sm font-bold text-white">
+              Contact & Profile Details
+            </h3>
+            <p className="text-xs text-rose-300/70">
+              Personal contact records and preferences
+            </p>
+          </div>
+        </div>
+
+        {savedSuccess && (
+          <div className="p-3.5 bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 rounded-2xl flex items-center gap-2 text-xs">
+            <CheckCircle2 className="w-4 h-4" /> Profile details saved successfully!
+          </div>
+        )}
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+          <div className="space-y-1.5">
+            <label className="font-bold text-rose-200/90 uppercase tracking-wider text-[11px]">First Name</label>
+            <input
+              type="text"
+              value={firstName}
+              onChange={e => setFirstName(e.target.value)}
+              className="w-full p-3 bg-[#0E0103] border border-[#38080E] rounded-xl text-white placeholder-rose-400/40 focus:outline-none focus:border-rose-500"
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="font-bold text-rose-200/90 uppercase tracking-wider text-[11px]">Last Name</label>
+            <input
+              type="text"
+              value={lastName}
+              onChange={e => setLastName(e.target.value)}
+              className="w-full p-3 bg-[#0E0103] border border-[#38080E] rounded-xl text-white placeholder-rose-400/40 focus:outline-none focus:border-rose-500"
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="font-bold text-rose-200/90 uppercase tracking-wider text-[11px]">Primary Email</label>
+            <input
+              type="email"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              className="w-full p-3 bg-[#0E0103] border border-[#38080E] rounded-xl text-white placeholder-rose-400/40 focus:outline-none focus:border-rose-500"
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="font-bold text-rose-200/90 uppercase tracking-wider text-[11px]">Mobile Phone</label>
+            <input
+              type="tel"
+              value={phone}
+              onChange={e => setPhone(e.target.value)}
+              className="w-full p-3 bg-[#0E0103] border border-[#38080E] rounded-xl text-white placeholder-rose-400/40 focus:outline-none focus:border-rose-500"
+            />
+          </div>
+        </div>
+
+        <div className="flex justify-end pt-2">
+          <button
+            type="submit"
+            className="px-6 py-2.5 rounded-2xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold shadow-xs transition-colors"
+          >
+            Save Profile Details
+          </button>
+        </div>
+      </form>
+
       {/* Persona Switcher Box (for Demo testing) */}
-      <div className="bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent border border-amber-200 dark:border-amber-900/50 p-6 rounded-3xl space-y-3">
+      <div className="bg-[#1C0407] border border-[#38080E] p-6 rounded-3xl space-y-3">
         <div className="flex items-center gap-2">
-          <Sparkles className="w-4 h-4 text-amber-600 dark:text-amber-400" />
-          <h3 className="text-xs font-bold text-amber-900 dark:text-amber-300 uppercase tracking-wider">
-            Prototype Persona Switcher
+          <Sparkles className="w-4 h-4 text-amber-400" />
+          <h3 className="text-xs font-bold text-amber-300 uppercase tracking-wider">
+            Simulation Persona Switcher
           </h3>
         </div>
-        <p className="text-xs text-amber-800/80 dark:text-amber-400/80">
+        <p className="text-xs text-rose-300/70">
           Switch between simulated customer and administrative staff accounts to evaluate different permission tiers:
         </p>
 
@@ -83,89 +184,25 @@ export const ProfileSettingsView: React.FC = () => {
               onClick={() => switchUser(u.id)}
               className={`p-3 rounded-2xl border text-left transition-all text-xs ${
                 u.id === currentUser.id
-                  ? 'border-amber-500 bg-white dark:bg-zinc-900 shadow-xs ring-2 ring-amber-500/20'
-                  : 'border-zinc-200 dark:border-zinc-800 bg-white/60 dark:bg-zinc-900/60 hover:bg-white dark:hover:bg-zinc-900'
+                  ? 'border-rose-500 bg-rose-500/10 shadow-xs ring-2 ring-rose-500/20'
+                  : 'border-[#38080E] bg-[#0E0103] hover:border-rose-500/40'
               }`}
             >
-              <div className="font-bold text-zinc-900 dark:text-white">{u.firstName} {u.lastName}</div>
-              <div className="text-[10px] text-zinc-400 uppercase font-semibold mt-0.5">{u.role}</div>
+              <div className="font-bold text-white">{u.firstName} {u.lastName}</div>
+              <div className="text-[10px] text-rose-400/70 uppercase font-semibold mt-0.5">{u.role}</div>
             </button>
           ))}
         </div>
       </div>
 
-      {/* Edit Personal Details Form */}
-      <form onSubmit={handleSaveProfile} className="bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200/80 dark:border-zinc-800 shadow-sm p-6 sm:p-8 space-y-6">
-        <h3 className="text-sm font-bold text-zinc-900 dark:text-white">
-          Contact & Domicile Details
-        </h3>
-
-        {savedSuccess && (
-          <div className="p-3.5 bg-emerald-50 text-emerald-700 rounded-2xl flex items-center gap-2 text-xs border border-emerald-200">
-            <CheckCircle2 className="w-4 h-4" /> Profile details saved successfully!
-          </div>
-        )}
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-          <div className="space-y-1.5">
-            <label className="font-bold text-zinc-700 dark:text-zinc-300">First Name</label>
-            <input
-              type="text"
-              value={firstName}
-              onChange={e => setFirstName(e.target.value)}
-              className="w-full p-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white"
-            />
-          </div>
-
-          <div className="space-y-1.5">
-            <label className="font-bold text-zinc-700 dark:text-zinc-300">Last Name</label>
-            <input
-              type="text"
-              value={lastName}
-              onChange={e => setLastName(e.target.value)}
-              className="w-full p-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white"
-            />
-          </div>
-
-          <div className="space-y-1.5">
-            <label className="font-bold text-zinc-700 dark:text-zinc-300">Primary Email</label>
-            <input
-              type="email"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-              className="w-full p-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white"
-            />
-          </div>
-
-          <div className="space-y-1.5">
-            <label className="font-bold text-zinc-700 dark:text-zinc-300">Mobile Phone</label>
-            <input
-              type="tel"
-              value={phone}
-              onChange={e => setPhone(e.target.value)}
-              className="w-full p-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white"
-            />
-          </div>
-        </div>
-
-        <div className="flex justify-end pt-2">
-          <button
-            type="submit"
-            className="px-6 py-2.5 rounded-2xl bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 text-xs font-bold shadow-xs hover:bg-zinc-800 dark:hover:bg-zinc-200"
-          >
-            Save Changes
-          </button>
-        </div>
-      </form>
-
       {/* Danger Zone: Reset Mock Data */}
-      <div className="bg-rose-50/50 dark:bg-rose-950/20 rounded-3xl border border-rose-200 dark:border-rose-900/50 p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="bg-rose-500/5 rounded-3xl border border-rose-500/20 p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h3 className="text-xs font-bold text-rose-700 dark:text-rose-400 uppercase tracking-wider">
+          <h3 className="text-xs font-bold text-rose-400 uppercase tracking-wider">
             Reset Prototype Storage
           </h3>
-          <p className="text-xs text-rose-600/80 dark:text-rose-400/80 mt-0.5">
-            Clear customized local records and re-seed with fresh 100+ transactions and accounts.
+          <p className="text-xs text-rose-300/70 mt-0.5">
+            Clear customized local records and re-seed with fresh default accounts.
           </p>
         </div>
 

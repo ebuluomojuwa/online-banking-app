@@ -9,7 +9,7 @@ import {
   ArrowUpRight,
   ShieldCheck
 } from 'lucide-react';
-import { useBanking } from '../../context/BankingContext';
+import { useBanking, isWelcomeCreditTransaction } from '../../context/BankingContext';
 import { Transaction } from '../../types';
 import { Badge, Modal } from '../ui';
 
@@ -19,10 +19,12 @@ export const AdminTransactionsView: React.FC = () => {
   const [selectedTxForReverse, setSelectedTxForReverse] = useState<Transaction | null>(null);
 
   const filteredTransactions = transactions.filter(t => 
-    t.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    t.reference.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    t.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    t.accountName.toLowerCase().includes(searchTerm.toLowerCase())
+    !isWelcomeCreditTransaction(t) && (
+      t.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      t.reference.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      t.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      t.accountName.toLowerCase().includes(searchTerm.toLowerCase())
+    )
   );
 
   const handleConfirmReverse = () => {

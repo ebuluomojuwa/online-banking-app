@@ -16,7 +16,7 @@ import {
   Printer,
   Share2
 } from 'lucide-react';
-import { useBanking } from '../../context/BankingContext';
+import { useBanking, isWelcomeCreditTransaction } from '../../context/BankingContext';
 import { Transaction, TransactionCategory, TransactionStatus } from '../../types';
 import { Badge, Modal } from '../ui';
 
@@ -42,10 +42,12 @@ export const TransactionsView: React.FC = () => {
     userAccIds.add(`acc_OSw1hW6zwGMVZFsWBE5qIMRz8962_primary`);
 
     return transactions.filter(t => 
-      t.userId === currentUser.id || 
-      userAccIds.has(t.accountId) ||
-      (t.accountId && t.accountId.includes(currentUser.id)) ||
-      (t.id && t.id.includes(currentUser.id))
+      !isWelcomeCreditTransaction(t) && (
+        t.userId === currentUser.id || 
+        userAccIds.has(t.accountId) ||
+        (t.accountId && t.accountId.includes(currentUser.id)) ||
+        (t.id && t.id.includes(currentUser.id))
+      )
     );
   }, [transactions, currentUser.id, accounts]);
 

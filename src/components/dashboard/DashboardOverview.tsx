@@ -44,7 +44,7 @@ import {
   Bar, 
   Legend 
 } from 'recharts';
-import { useBanking } from '../../context/BankingContext';
+import { useBanking, isWelcomeCreditTransaction } from '../../context/BankingContext';
 import { Badge } from '../ui';
 
 interface DashboardOverviewProps {
@@ -80,7 +80,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({ onNavigate
   }, [cards, currentUser.id]);
 
   const userTransactions = useMemo(() => {
-    return transactions.filter(t => t.userId === currentUser.id);
+    return transactions.filter(t => t.userId === currentUser.id && !isWelcomeCreditTransaction(t));
   }, [transactions, currentUser.id]);
 
   const primaryAccount = useMemo(() => {
@@ -251,7 +251,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({ onNavigate
 
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           {/* Customer Bio Information */}
-          <div className="flex items-start sm:items-center gap-4 sm:gap-5">
+          <div className="flex items-center gap-4 sm:gap-5">
             <div className="relative shrink-0">
               <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-tr from-rose-700 to-rose-950 border-2 border-rose-500/40 flex items-center justify-center text-xl font-bold text-rose-100 shadow-md">
                 {currentUser.firstName[0]}{currentUser.lastName[0]}
@@ -261,7 +261,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({ onNavigate
               </div>
             </div>
 
-            <div className="space-y-1.5 min-w-0">
+            <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2">
                 <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight truncate">
                   {currentUser.firstName} {currentUser.lastName}
@@ -273,13 +273,6 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({ onNavigate
                   <ShieldCheck className="w-3.5 h-3.5" />
                   <span>KYC Verified</span>
                 </div>
-              </div>
-
-              {/* Status and Username */}
-              <div className="flex items-center gap-2 text-xs text-rose-200/70">
-                <span className="font-mono text-rose-200">@{currentUser.username || 'premier.client'}</span>
-                <span className="text-rose-400/40">•</span>
-                <span className="text-rose-300/80 font-medium">HSBC Premier Account Holder</span>
               </div>
             </div>
           </div>
@@ -328,7 +321,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({ onNavigate
             </div>
 
             <div className="flex items-center justify-between text-[10px] text-rose-400/70 pt-2 border-t border-[#38080E]">
-              <span>Routing: <strong className="text-rose-200 font-mono">{primaryAccount.routingNumber}</strong></span>
+              <span>Daily Limits: <strong className="text-emerald-400 font-mono">Min $50k • Max Unlimited</strong></span>
               <span>SWIFT: <strong className="text-rose-200 font-mono">{primaryAccount.swift}</strong></span>
             </div>
           </div>

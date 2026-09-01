@@ -327,6 +327,9 @@ export const INITIAL_ACCOUNTS: BankAccount[] = [
     status: 'ACTIVE',
     isPrimary: true,
     interestRate: 0.85,
+    minDailyWithdrawal: 50000,
+    maxDailyWithdrawal: null,
+    dailyWithdrawalLimit: 'Unlimited',
     createdAt: '2023-01-15T08:00:00Z',
   },
   {

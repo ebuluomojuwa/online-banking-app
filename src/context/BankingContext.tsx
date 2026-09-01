@@ -41,6 +41,7 @@ import {
   getDocs,
   setDoc,
   updateDoc,
+  deleteDoc,
   query,
   where,
   onSnapshot, 
@@ -48,7 +49,10 @@ import {
   createUserWithEmailAndPassword, 
   signOut, 
   updateProfile, 
-  onAuthStateChanged 
+  onAuthStateChanged,
+  EmailAuthProvider,
+  reauthenticateWithCredential,
+  updatePassword
 } from '../lib/firebase';
 import { 
   seedFirestoreIfEmpty,
@@ -161,6 +165,11 @@ export interface BankingContextType {
 
   // Security & Profile
   updateUserProfile: (updates: Partial<UserProfile>) => void;
+  changePassword: (
+    currentPassword: string,
+    newPassword: string,
+    confirmPassword?: string
+  ) => Promise<{ success: boolean; error?: string }>;
   revokeSession: (sessionId: string) => void;
   revokeAllOtherSessions: () => void;
   resetAllDemoData: () => void;
@@ -213,6 +222,44 @@ const BLANK_USER: UserProfile = {
   securityScore: 95,
   createdAt: new Date().toISOString(),
   lastLogin: new Date().toISOString(),
+};
+
+export const isPrimaryAccount = (acc: BankAccount | null | undefined): boolean => {
+  if (!acc) return false;
+  return Boolean(
+    acc.isPrimary ||
+    (acc.id && acc.id.includes('primary')) ||
+    acc.type === 'CHECKING' ||
+    (acc.name && acc.name.toLowerCase().includes('premier checking'))
+  );
+};
+
+export const isWelcomeCreditTransaction = (t: Partial<Transaction>): boolean => {
+  if (!t) return false;
+  const desc = (t.description || '').toLowerCase();
+  const merchant = (t.merchantName || '').toLowerCase();
+  const ref = (t.reference || '').toLowerCase();
+  const note = (t.note || '').toLowerCase();
+  const id = (t.id || '').toLowerCase();
+  
+  if (
+    desc.includes('welcome credit') || 
+    desc.includes('account opening') || 
+    desc.includes('welcome bonus') ||
+    merchant.includes('welcome credit') || 
+    merchant.includes('account opening') ||
+    note.includes('welcome credit') || 
+    note.includes('account opening') ||
+    ref.includes('welcome') || 
+    ref.includes('open-cred') ||
+    id.includes('welcome_credit') || 
+    id.includes('welcome-credit') ||
+    id.includes('welcome_tx') ||
+    (t.amount === 10000 && (desc.includes('credit') || desc.includes('welcome') || desc.includes('opening')))
+  ) {
+    return true;
+  }
+  return false;
 };
 
 export const BankingProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -440,7 +487,9 @@ export const BankingProvider: React.FC<{ children: React.ReactNode }> = ({ child
               if (!unsubAdminTx) {
                 unsubAdminTx = onSnapshot(collection(db, 'transactions'), snap => {
                   if (!snap.empty) {
-                    const txs = snap.docs.map(d => ({ ...d.data(), id: d.id } as Transaction));
+                    const txs = snap.docs
+                      .map(d => ({ ...d.data(), id: d.id } as Transaction))
+                      .filter(t => !isWelcomeCreditTransaction(t));
                     txs.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
                     setAdminAllTransactions(txs);
                   }
@@ -539,6 +588,9 @@ export const BankingProvider: React.FC<{ children: React.ReactNode }> = ({ child
                 isPrimary: true,
                 status: 'ACTIVE',
                 interestRate: 0.005,
+                minDailyWithdrawal: 50000,
+                maxDailyWithdrawal: null,
+                dailyWithdrawalLimit: 'Unlimited',
                 createdAt: nowIso,
               };
               await setDoc(accRef, newAcc, { merge: true });
@@ -607,21 +659,43 @@ export const BankingProvider: React.FC<{ children: React.ReactNode }> = ({ child
         // 2. Real-time Firestore query subscriptions strictly filtered by the authenticated user's UID and accounts
         const qAcc = query(collection(db, 'accounts'), where('userId', '==', uid));
         unsubAccounts = onSnapshot(qAcc, snap => {
-          setAccounts(snap.docs.map(d => ({ ...d.data(), id: d.id } as BankAccount)));
-        }, err => console.warn('accounts listener error:', err));
-
-        unsubTx = onSnapshot(collection(db, 'transactions'), snap => {
-          const allTxs = snap.docs.map(d => {
+          const loadedAccounts = snap.docs.map(d => {
             const data = d.data();
-            const txStatus = (data.status === 'Completed' || data.status === 'Posted') ? 'Posted' : (data.status || 'Posted');
+            const isPrimary = Boolean(data.isPrimary || d.id.includes('primary') || data.type === 'CHECKING' || data.name?.toLowerCase().includes('premier checking'));
             return {
               ...data,
               id: d.id,
-              recipientOrSender: data.recipientOrSender || data.sender || data.merchantName || 'Feng Hong',
-              category: data.category || data.type || 'Deposit',
-              status: txStatus,
-            } as Transaction;
+              isPrimary,
+              minDailyWithdrawal: isPrimary ? 50000 : (data.minDailyWithdrawal ?? 0),
+              maxDailyWithdrawal: isPrimary ? null : (data.maxDailyWithdrawal ?? null),
+              dailyWithdrawalLimit: isPrimary ? 'Unlimited' : (data.dailyWithdrawalLimit ?? 'Standard'),
+            } as BankAccount;
           });
+          setAccounts(loadedAccounts);
+        }, err => console.warn('accounts listener error:', err));
+
+        unsubTx = onSnapshot(collection(db, 'transactions'), snap => {
+          // Asynchronously purge any welcome credit transactions from Firestore if present
+          snap.docs.forEach(d => {
+            const data = d.data();
+            if (isWelcomeCreditTransaction({ ...data, id: d.id })) {
+              deleteDoc(doc(db, 'transactions', d.id)).catch(err => console.warn('Purging welcome credit doc:', err));
+            }
+          });
+
+          const allTxs = snap.docs
+            .map(d => {
+              const data = d.data();
+              const txStatus = (data.status === 'Completed' || data.status === 'Posted') ? 'Posted' : (data.status || 'Posted');
+              return {
+                ...data,
+                id: d.id,
+                recipientOrSender: data.recipientOrSender || data.sender || data.merchantName || 'Feng Hong',
+                category: data.category || data.type || 'Deposit',
+                status: txStatus,
+              } as Transaction;
+            })
+            .filter(t => !isWelcomeCreditTransaction(t));
 
           const userAccIds = new Set<string>();
           userAccIds.add(`acc_${uid}_primary`);
@@ -1108,6 +1182,16 @@ export const BankingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     if (!fromAcc) {
       return { success: false, error: 'Source account not found' };
     }
+
+    // Enforce withdrawal rules for primary account: Min $50,000 USD, Max Unlimited
+    const isPrimary = isPrimaryAccount(fromAcc) || accounts[0]?.id === fromAcc.id;
+    if (isPrimary && params.amount < 50000) {
+      return {
+        success: false,
+        error: 'Minimum daily withdrawal amount for Primary Premier Account is $50,000.00 USD. Maximum daily withdrawal is Unlimited.',
+      };
+    }
+
     if (fromAcc.availableBalance < params.amount) {
       return { success: false, error: `Insufficient funds. Available: $${fromAcc.availableBalance.toFixed(2)}` };
     }
@@ -1557,6 +1641,132 @@ export const BankingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     await saveUserToFirestore(updatedUser);
   };
 
+  const changePassword = async (
+    currentPassword: string,
+    newPassword: string,
+    confirmPassword?: string
+  ): Promise<{ success: boolean; error?: string }> => {
+    if (!currentPassword || !currentPassword.trim()) {
+      return { success: false, error: 'Please enter your current password.' };
+    }
+    if (!newPassword || !newPassword.trim()) {
+      return { success: false, error: 'Please enter your new password.' };
+    }
+    if (confirmPassword !== undefined && newPassword !== confirmPassword) {
+      return { success: false, error: 'New password and confirmation password do not match.' };
+    }
+    if (newPassword.length < 8) {
+      return { success: false, error: 'New password must be at least 8 characters long.' };
+    }
+    if (!/[A-Za-z]/.test(newPassword) || !/[0-9]/.test(newPassword)) {
+      return { success: false, error: 'New password must include both letters and numbers.' };
+    }
+    if (currentPassword === newPassword) {
+      return { success: false, error: 'New password cannot be the same as your current password.' };
+    }
+
+    try {
+      // 1. If Firebase Auth has an active user session, reauthenticate & update password securely
+      if (auth.currentUser) {
+        const userEmail = auth.currentUser.email || currentUser.email;
+        if (!userEmail) {
+          return { success: false, error: 'Unable to identify authenticated user email for re-authentication.' };
+        }
+
+        try {
+          const credential = EmailAuthProvider.credential(userEmail, currentPassword);
+          await reauthenticateWithCredential(auth.currentUser, credential);
+        } catch (authErr: any) {
+          console.warn('Re-authentication error in changePassword:', authErr);
+          const errCode = authErr?.code || '';
+          const errMsg = authErr?.message || '';
+          if (
+            errCode === 'auth/wrong-password' ||
+            errCode === 'auth/invalid-credential' ||
+            errMsg.includes('invalid-credential') ||
+            errMsg.includes('wrong-password')
+          ) {
+            return {
+              success: false,
+              error: 'The current password you entered is incorrect. Please verify your current password and try again.',
+            };
+          }
+          if (errCode === 'auth/too-many-requests') {
+            return {
+              success: false,
+              error: 'Access temporarily locked due to multiple failed attempts. Please try again later.',
+            };
+          }
+          return {
+            success: false,
+            error: errMsg || 'Current password verification failed.',
+          };
+        }
+
+        try {
+          await updatePassword(auth.currentUser, newPassword);
+        } catch (updErr: any) {
+          console.warn('Update password error in Firebase Auth:', updErr);
+          const errCode = updErr?.code || '';
+          const errMsg = updErr?.message || '';
+          if (errCode === 'auth/weak-password') {
+            return { success: false, error: 'The new password is too weak. Please use a stronger combination of letters, numbers, and symbols.' };
+          }
+          if (errCode === 'auth/requires-recent-login') {
+            return { success: false, error: 'Session requires fresh login. Please log out and sign in again before changing your password.' };
+          }
+          return { success: false, error: errMsg || 'Failed to update password in Firebase Authentication.' };
+        }
+      } else {
+        // Fallback for demo persona mode when auth.currentUser is not active
+        if (currentUser.password && currentUser.password !== currentPassword) {
+          return {
+            success: false,
+            error: 'The current password you entered is incorrect. Please verify your current password and try again.',
+          };
+        }
+      }
+
+      // 2. Safely sync password update into Firestore users collection without touching any other fields
+      if (currentUser.id) {
+        const nowIso = new Date().toISOString();
+        await setDoc(
+          doc(db, 'users', currentUser.id),
+          {
+            password: newPassword,
+            lastPasswordChange: nowIso,
+            updatedAt: nowIso,
+          },
+          { merge: true }
+        );
+      }
+
+      // 3. Update local user profile state (preserving all other fields like balances, accounts, cards)
+      setCurrentUserProfile(prev => ({
+        ...prev,
+        password: newPassword,
+        lastPasswordChange: new Date().toISOString(),
+      }));
+
+      // 4. Log security notification for the user
+      const secNotif: NotificationItem = {
+        id: 'NOTIF-' + Date.now(),
+        userId: currentUser.id || 'usr-1',
+        title: 'Security Notice: Password Updated',
+        message: 'Your portal account password was successfully updated via Firebase Authentication.',
+        type: 'SECURITY',
+        isRead: false,
+        createdAt: new Date().toISOString(),
+      };
+      await saveNotificationToFirestore(secNotif);
+
+      return { success: true };
+    } catch (err: any) {
+      console.error('changePassword error:', err);
+      return { success: false, error: err?.message || 'An unexpected error occurred while updating your password.' };
+    }
+  };
+
   const revokeSession = async (sessionId: string) => {
     try {
       await setDoc(doc(db, 'loginSessions', sessionId), { isCurrent: false }, { merge: true });
@@ -1744,6 +1954,7 @@ export const BankingProvider: React.FC<{ children: React.ReactNode }> = ({ child
         createSupportTicket,
         replyToSupportTicket,
         updateUserProfile,
+        changePassword,
         revokeSession,
         revokeAllOtherSessions,
         resetAllDemoData,

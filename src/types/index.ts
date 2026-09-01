@@ -20,6 +20,9 @@ export interface BankAccount {
   isPrimary?: boolean;
   interestRate?: number;
   creditLimit?: number;
+  minDailyWithdrawal?: number;
+  maxDailyWithdrawal?: number | null;
+  dailyWithdrawalLimit?: string;
   createdAt: string;
 }
 
@@ -296,4 +299,6 @@ export interface UserProfile {
   securityScore: number; // e.g. 96
   createdAt: string;
   lastLogin: string;
+  lastPasswordChange?: string;
+  memberSince?: string;
 }

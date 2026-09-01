@@ -6,7 +6,10 @@ import {
   createUserWithEmailAndPassword,
   signOut,
   updateProfile,
-  onAuthStateChanged, 
+  onAuthStateChanged,
+  EmailAuthProvider,
+  reauthenticateWithCredential,
+  updatePassword,
   User as FirebaseUser 
 } from 'firebase/auth';
 import { 
@@ -45,6 +48,9 @@ export {
   signOut,
   updateProfile,
   onAuthStateChanged,
+  EmailAuthProvider,
+  reauthenticateWithCredential,
+  updatePassword,
   collection,
   doc,
   setDoc,

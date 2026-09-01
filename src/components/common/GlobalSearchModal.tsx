@@ -10,7 +10,7 @@ import {
   CreditCard,
   X
 } from 'lucide-react';
-import { useBanking } from '../../context/BankingContext';
+import { useBanking, isWelcomeCreditTransaction } from '../../context/BankingContext';
 
 interface GlobalSearchModalProps {
   isOpen: boolean;
@@ -45,10 +45,12 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({ isOpen, on
     );
 
     const matchedTransactions = transactions.filter(
-      t => t.description.toLowerCase().includes(q) || 
+      t => !isWelcomeCreditTransaction(t) && (
+           t.description.toLowerCase().includes(q) || 
            t.merchantName?.toLowerCase().includes(q) ||
            t.category.toLowerCase().includes(q) ||
            t.reference.toLowerCase().includes(q)
+      )
     ).slice(0, 5);
 
     const matchedBeneficiaries = beneficiaries.filter(
