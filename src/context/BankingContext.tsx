@@ -730,7 +730,7 @@ export const BankingProvider: React.FC<{ children: React.ReactNode }> = ({ child
   };
 
   const login = async (identifier: string, password?: string): Promise<{ success: boolean; error?: string }> => {
-    const cleanId = identifier.trim().toLowerCase();
+    const cleanId = identifier.trim();
     if (!cleanId) {
       return { success: false, error: 'Please enter your username or email address.' };
     }
@@ -744,11 +744,11 @@ export const BankingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     if (!cleanId.includes('@')) {
       const userDoc = await findUserByEmailOrUsername(cleanId);
       if (userDoc && userDoc.email) {
-        emailToUse = userDoc.email.toLowerCase();
+        emailToUse = userDoc.email.trim();
       } else {
         return { 
           success: false, 
-          error: 'No registered account found matching this username or customer ID.' 
+          error: `[auth/user-not-found] No account found in records matching "${cleanId}". If you have an email/password account in Firebase Authentication, please enter your full email address.` 
         };
       }
     }
@@ -766,7 +766,7 @@ export const BankingProvider: React.FC<{ children: React.ReactNode }> = ({ child
           await signOut(auth);
           return { 
             success: false, 
-            error: 'This account has been temporarily locked by HSBC Security. Please contact Premier Support.' 
+            error: '[auth/user-suspended] This account has been temporarily locked by HSBC Security. Please contact Premier Support.' 
           };
         }
         await saveUserToFirestore({ ...profile, lastLogin: nowIso });
@@ -802,27 +802,43 @@ export const BankingProvider: React.FC<{ children: React.ReactNode }> = ({ child
       return { success: true };
     } catch (authErr: any) {
       console.warn('Firebase signIn error:', authErr);
-      if (authErr.code === 'auth/user-not-found' || authErr.code === 'auth/invalid-credential') {
-        return { 
-          success: false, 
-          error: 'Invalid credentials. Please verify your email and password, or open a new account.' 
-        };
+      const errorCode = authErr?.code || 'auth/unknown-error';
+      const errorMessage = authErr?.message || 'Authentication failed.';
+
+      let descriptiveMsg = '';
+      switch (errorCode) {
+        case 'auth/invalid-credential':
+          descriptiveMsg = `[auth/invalid-credential] The email (${emailToUse}) or password does not match Firebase Authentication records. Please check for typing or capitalization differences in your password.`;
+          break;
+        case 'auth/user-not-found':
+          descriptiveMsg = `[auth/user-not-found] No Firebase Authentication user exists for "${emailToUse}".`;
+          break;
+        case 'auth/wrong-password':
+          descriptiveMsg = `[auth/wrong-password] The password entered for "${emailToUse}" is incorrect.`;
+          break;
+        case 'auth/operation-not-allowed':
+          descriptiveMsg = `[auth/operation-not-allowed] Email/Password sign-in provider is disabled in the Firebase project (${auth.app.options.projectId}).`;
+          break;
+        case 'auth/too-many-requests':
+          descriptiveMsg = `[auth/too-many-requests] Access to this account has been temporarily disabled due to many failed login attempts. Please reset your password or try again later.`;
+          break;
+        case 'auth/user-disabled':
+          descriptiveMsg = `[auth/user-disabled] The user account for "${emailToUse}" has been disabled in Firebase Authentication.`;
+          break;
+        case 'auth/invalid-email':
+          descriptiveMsg = `[auth/invalid-email] The email address "${emailToUse}" is badly formatted.`;
+          break;
+        case 'auth/network-request-failed':
+          descriptiveMsg = `[auth/network-request-failed] A network error occurred while connecting to Firebase Authentication (${auth.app.options.authDomain}).`;
+          break;
+        default:
+          descriptiveMsg = `[${errorCode}] ${errorMessage}`;
+          break;
       }
-      if (authErr.code === 'auth/wrong-password') {
-        return { 
-          success: false, 
-          error: 'Incorrect password entered. Please check your password and try again.' 
-        };
-      }
-      if (authErr.code === 'auth/too-many-requests') {
-        return { 
-          success: false, 
-          error: 'Access temporarily locked due to multiple failed login attempts. Please try again later.' 
-        };
-      }
+
       return { 
         success: false, 
-        error: authErr.message || 'Authentication failed. Please verify your credentials.' 
+        error: descriptiveMsg 
       };
     }
   };
