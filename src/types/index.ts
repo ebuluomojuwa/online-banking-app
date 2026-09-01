@@ -23,10 +23,10 @@ export interface BankAccount {
   createdAt: string;
 }
 
-export type TransactionStatus = 'Completed' | 'Pending' | 'Failed' | 'Reversed';
+export type TransactionStatus = 'Completed' | 'Posted' | 'Pending' | 'Failed' | 'Reversed';
 export type TransactionCategory = 
   | 'Salary' 
-  | 'Income'
+  | 'Income' 
   | 'Deposit'
   | 'Transfer' 
   | 'Groceries' 
@@ -49,6 +49,8 @@ export interface Transaction {
   accountName: string;
   description: string;
   merchantName?: string;
+  sender?: string;
+  type?: string;
   category: TransactionCategory;
   amount: number; // positive = credit/income, negative = debit/expense
   currency: string;
@@ -258,6 +260,9 @@ export type User = any;
 
 export interface UserProfile {
   id: string;
+  name?: string;
+  accountNumber?: string;
+  availableBalance?: number;
   customerId: string; // e.g. "HSBC-CUST-482019"
   username: string; // e.g. "gregoriolind"
   password?: string;

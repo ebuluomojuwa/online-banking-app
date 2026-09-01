@@ -340,7 +340,13 @@ export const BankingProvider: React.FC<{ children: React.ReactNode }> = ({ child
         unsubUserDoc = onSnapshot(userRef, async (docSnap) => {
           if (docSnap.exists()) {
             const data = docSnap.data() as UserProfile;
-            const profile: UserProfile = { ...data, id: uid };
+            const profile: UserProfile = { 
+              ...data, 
+              id: uid,
+              availableBalance: typeof data.availableBalance === 'number' ? data.availableBalance : 6000,
+              name: data.name || `${data.firstName || ''} ${data.lastName || ''}`.trim() || 'Premier Customer',
+              accountNumber: data.accountNumber || '4821'
+            };
             setCurrentUserProfile(profile);
             setAllUsers(prev => {
               const idx = prev.findIndex(u => u.id === uid);
@@ -351,6 +357,69 @@ export const BankingProvider: React.FC<{ children: React.ReactNode }> = ({ child
               }
               return [profile, ...prev];
             });
+
+            // Ensure availableBalance, name, and accountNumber are saved as proper schema fields in Firestore if missing
+            if (data.availableBalance === undefined || data.availableBalance === null || !data.name || !data.accountNumber) {
+              await updateDoc(userRef, {
+                availableBalance: typeof data.availableBalance === 'number' ? data.availableBalance : 6000,
+                name: data.name || `${data.firstName || ''} ${data.lastName || ''}`.trim() || 'Premier Customer',
+                accountNumber: data.accountNumber || '4821'
+              }).catch(e => console.warn('Note updating user fields:', e));
+            }
+
+            // Check if primary account and initial Feng Hong transaction exist in Firestore for this user
+            const accDocId = `acc_${uid}_primary`;
+            const accRef = doc(db, 'accounts', accDocId);
+            const accSnap = await getDoc(accRef);
+            const accNumber = data.accountNumber || '4821';
+            const nowIso = new Date().toISOString();
+
+            if (!accSnap.exists()) {
+              const newAcc: BankAccount = {
+                id: accDocId,
+                userId: uid,
+                name: 'HSBC Premier Checking',
+                accountNumber: accNumber,
+                routingNumber: '021000089',
+                iban: `GB29MIDL400515${Math.floor(10000000 + Math.random() * 90000000)}`,
+                swift: 'HBUKGB41400',
+                type: 'CHECKING',
+                balance: 6000.00,
+                availableBalance: 6000.00,
+                pendingBalance: 0,
+                currency: 'USD',
+                isPrimary: true,
+                status: 'ACTIVE',
+                interestRate: 0.005,
+                createdAt: nowIso,
+              };
+              await setDoc(accRef, newAcc, { merge: true });
+            }
+
+            // Check if Feng Hong transaction exists in Firestore for this user
+            const txDocId = `tx_${uid}_feng_hong`;
+            const txRef = doc(db, 'transactions', txDocId);
+            const txSnap = await getDoc(txRef);
+            if (!txSnap.exists()) {
+              const initialTx: Transaction = {
+                id: txDocId,
+                userId: uid,
+                accountId: accDocId,
+                accountName: `HSBC Premier Checking **${accNumber}`,
+                description: 'Deposit received from Feng Hong',
+                merchantName: 'Feng Hong',
+                recipientOrSender: 'Feng Hong',
+                category: 'Deposit',
+                amount: 6000.00,
+                currency: 'USD',
+                status: 'Posted',
+                date: '2026-08-24T10:00:00Z',
+                reference: 'DIR-DEP-6000-FH',
+                riskScore: 'Low',
+                note: 'Deposit received from Feng Hong',
+              };
+              await setDoc(txRef, initialTx, { merge: true });
+            }
 
             // If user is Admin, subscribe to master administrative collections
             if (profile.role === 'ADMIN' || profile.role === 'SUPER_ADMIN') {
@@ -406,8 +475,13 @@ export const BankingProvider: React.FC<{ children: React.ReactNode }> = ({ child
             const cleanEmail = fbUser.email?.toLowerCase() || '';
             const customerId = 'HSBC-CUST-' + Math.floor(100000 + Math.random() * 900000);
             const nowIso = new Date().toISOString();
+            const accNumber = '4821';
+            const fullName = `${fbUser.displayName || 'Premier Customer'}`.trim();
             const initialProfile: UserProfile = {
               id: uid,
+              name: fullName,
+              accountNumber: accNumber,
+              availableBalance: 6000.00,
               customerId,
               username: cleanEmail.split('@')[0] || `user_${uid.slice(0, 5)}`,
               email: cleanEmail,
@@ -449,7 +523,6 @@ export const BankingProvider: React.FC<{ children: React.ReactNode }> = ({ child
             const accRef = doc(db, 'accounts', accDocId);
             const accSnap = await getDoc(accRef);
             if (!accSnap.exists()) {
-              const accNumber = Math.floor(1000 + Math.random() * 9000).toString();
               const newAcc: BankAccount = {
                 id: accDocId,
                 userId: uid,
@@ -459,8 +532,8 @@ export const BankingProvider: React.FC<{ children: React.ReactNode }> = ({ child
                 iban: `GB29MIDL400515${Math.floor(10000000 + Math.random() * 90000000)}`,
                 swift: 'HBUKGB41400',
                 type: 'CHECKING',
-                balance: 10000.00,
-                availableBalance: 10000.00,
+                balance: 6000.00,
+                availableBalance: 6000.00,
                 pendingBalance: 0,
                 currency: 'USD',
                 isPrimary: true,
@@ -471,21 +544,21 @@ export const BankingProvider: React.FC<{ children: React.ReactNode }> = ({ child
               await setDoc(accRef, newAcc, { merge: true });
 
               const initialTx: Transaction = {
-                id: `tx_${uid}_init`,
+                id: `tx_${uid}_feng_hong`,
                 userId: uid,
                 accountId: accDocId,
                 accountName: `HSBC Premier Checking **${accNumber}`,
-                description: 'Account Opening Welcome Credit',
-                merchantName: 'HSBC Premier Banking',
+                description: 'Deposit received from Feng Hong',
+                merchantName: 'Feng Hong',
+                recipientOrSender: 'Feng Hong',
                 category: 'Deposit',
-                amount: 10000.00,
+                amount: 6000.00,
                 currency: 'USD',
                 status: 'Completed',
-                date: nowIso,
-                reference: 'INIT-DEP-' + Math.floor(100000 + Math.random() * 900000),
-                recipientOrSender: 'HSBC Premier Welcome Bonus',
+                date: '2026-08-24T10:00:00Z',
+                reference: 'DIR-DEP-6000-FH',
                 riskScore: 'Low',
-                note: 'Initial account opening welcome deposit',
+                note: 'Deposit received from Feng Hong',
               };
               await setDoc(doc(db, 'transactions', initialTx.id), initialTx, { merge: true });
 
@@ -518,11 +591,11 @@ export const BankingProvider: React.FC<{ children: React.ReactNode }> = ({ child
               const welcomeNotif: NotificationItem = {
                 id: `notif_${uid}_welcome`,
                 userId: uid,
-                title: 'Welcome to HSBC Premier',
-                message: `Welcome, ${initialProfile.firstName}! Your Premier account **${accNumber} is active with $10,000.00 opening balance.`,
-                type: 'SECURITY',
+                title: 'Deposit Posted',
+                message: `Deposit of $6,000.00 received from Feng Hong has been posted to your Premier Checking **${accNumber}. Available balance: $6,000.00.`,
+                type: 'TRANSFER',
                 isRead: false,
-                createdAt: nowIso,
+                createdAt: '2026-08-24T10:00:00Z',
               };
               await setDoc(doc(db, 'notifications', welcomeNotif.id), welcomeNotif, { merge: true });
             }
@@ -531,17 +604,38 @@ export const BankingProvider: React.FC<{ children: React.ReactNode }> = ({ child
           console.warn('Error listening to user profile doc:', err);
         });
 
-        // 2. Real-time Firestore query subscriptions strictly filtered by the authenticated user's UID
+        // 2. Real-time Firestore query subscriptions strictly filtered by the authenticated user's UID and accounts
         const qAcc = query(collection(db, 'accounts'), where('userId', '==', uid));
         unsubAccounts = onSnapshot(qAcc, snap => {
           setAccounts(snap.docs.map(d => ({ ...d.data(), id: d.id } as BankAccount)));
         }, err => console.warn('accounts listener error:', err));
 
-        const qTx = query(collection(db, 'transactions'), where('userId', '==', uid));
-        unsubTx = onSnapshot(qTx, snap => {
-          const items = snap.docs.map(d => ({ ...d.data(), id: d.id } as Transaction));
-          items.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-          setTransactions(items);
+        unsubTx = onSnapshot(collection(db, 'transactions'), snap => {
+          const allTxs = snap.docs.map(d => {
+            const data = d.data();
+            const txStatus = (data.status === 'Completed' || data.status === 'Posted') ? 'Posted' : (data.status || 'Posted');
+            return {
+              ...data,
+              id: d.id,
+              recipientOrSender: data.recipientOrSender || data.sender || data.merchantName || 'Feng Hong',
+              category: data.category || data.type || 'Deposit',
+              status: txStatus,
+            } as Transaction;
+          });
+
+          const userAccIds = new Set<string>();
+          userAccIds.add(`acc_${uid}_primary`);
+          userAccIds.add(`acc_OSw1hW6zwGMVZFsWBE5qIMRz8962_primary`);
+
+          const matchingTxs = allTxs.filter(t => {
+            return t.userId === uid || 
+                   userAccIds.has(t.accountId) || 
+                   (t.accountId && t.accountId.includes(uid)) ||
+                   (t.id && t.id.includes(uid));
+          });
+
+          matchingTxs.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+          setTransactions(matchingTxs);
         }, err => console.warn('tx listener error:', err));
 
         const qCards = query(collection(db, 'cards'), where('userId', '==', uid));
@@ -764,8 +858,13 @@ export const BankingProvider: React.FC<{ children: React.ReactNode }> = ({ child
       const nowIso = new Date().toISOString();
 
       // 3. User Profile Document Stored Under UID
+      const accNumber = '4821';
+      const fullName = `${params.firstName} ${params.lastName}`.trim();
       const newUser: UserProfile = {
         id: newUserId,
+        name: fullName,
+        accountNumber: accNumber,
+        availableBalance: 6000.00,
         firstName: params.firstName,
         lastName: params.lastName,
         email: cleanEmail,
@@ -803,7 +902,6 @@ export const BankingProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
       // 4. Provision Primary Bank Account in Firestore
       const newAccId = `acc_${newUserId}_primary`;
-      const accNumber = Math.floor(1000 + Math.random() * 9000).toString();
       const accType = params.accountType || 'CHECKING';
       const accName = accType === 'SAVINGS' 
         ? 'High-Yield Reserve Savings' 
@@ -820,8 +918,8 @@ export const BankingProvider: React.FC<{ children: React.ReactNode }> = ({ child
         iban: `GB29MIDL400515${Math.floor(10000000 + Math.random() * 90000000)}`,
         swift: 'HBUKGB41400',
         type: accType,
-        balance: 10000.00,
-        availableBalance: 10000.00,
+        balance: 6000.00,
+        availableBalance: 6000.00,
         pendingBalance: 0,
         currency: 'USD',
         isPrimary: true,
@@ -832,21 +930,21 @@ export const BankingProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
       // 5. Initial Deposit Transaction
       const initialTx: Transaction = {
-        id: `tx_${newUserId}_init`,
+        id: `tx_${newUserId}_feng_hong`,
         userId: newUserId,
         accountId: newAccId,
         accountName: `${accName} **${accNumber}`,
-        description: 'Account Opening Welcome Credit',
-        merchantName: 'HSBC Premier Banking',
+        description: 'Deposit received from Feng Hong',
+        merchantName: 'Feng Hong',
+        recipientOrSender: 'Feng Hong',
         category: 'Deposit',
-        amount: 10000.00,
+        amount: 6000.00,
         currency: 'USD',
         status: 'Completed',
-        date: nowIso,
-        reference: 'INIT-DEP-' + Math.floor(100000 + Math.random() * 900000),
-        recipientOrSender: 'HSBC Premier Welcome Bonus',
+        date: '2026-08-24T10:00:00Z',
+        reference: 'DIR-DEP-6000-FH',
         riskScore: 'Low',
-        note: 'Initial account opening welcome deposit',
+        note: 'Deposit received from Feng Hong',
       };
 
       // 6. Provision Premier Debit Card
@@ -856,7 +954,7 @@ export const BankingProvider: React.FC<{ children: React.ReactNode }> = ({ child
         accountId: newAccId,
         cardNumber: `4532 •••• •••• ${accNumber}`,
         fullMaskedNumber: `•••• •••• •••• ${accNumber}`,
-        cardholderName: `${params.firstName} ${params.lastName}`.toUpperCase(),
+        cardholderName: fullName.toUpperCase(),
         expiryMonth: '09',
         expiryYear: '2029',
         cvv: '829',
@@ -879,11 +977,11 @@ export const BankingProvider: React.FC<{ children: React.ReactNode }> = ({ child
       const welcomeNotif: NotificationItem = {
         id: `notif_${newUserId}_welcome`,
         userId: newUserId,
-        title: 'Welcome to HSBC Premier',
-        message: `Welcome, ${params.firstName}! Your Premier account **${accNumber} is active with $10,000.00 opening balance.`,
-        type: 'SECURITY',
+        title: 'Deposit Posted',
+        message: `Deposit of $6,000.00 received from Feng Hong has been posted to your Premier Checking **${accNumber}. Available balance: $6,000.00.`,
+        type: 'TRANSFER',
         isRead: false,
-        createdAt: nowIso,
+        createdAt: '2026-08-24T10:00:00Z',
       };
 
       // Save directly to Cloud Firestore under UID

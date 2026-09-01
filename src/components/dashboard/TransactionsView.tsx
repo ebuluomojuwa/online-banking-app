@@ -35,10 +35,19 @@ export const TransactionsView: React.FC = () => {
   // Selected transaction for details modal
   const [selectedTx, setSelectedTx] = useState<Transaction | null>(null);
 
-  // Filter transactions for current user
+  // Filter transactions for current user and user's accounts
   const userTransactions = useMemo(() => {
-    return transactions.filter(t => t.userId === currentUser.id);
-  }, [transactions, currentUser.id]);
+    const userAccIds = new Set(accounts.map(a => a.id));
+    userAccIds.add(`acc_${currentUser.id}_primary`);
+    userAccIds.add(`acc_OSw1hW6zwGMVZFsWBE5qIMRz8962_primary`);
+
+    return transactions.filter(t => 
+      t.userId === currentUser.id || 
+      userAccIds.has(t.accountId) ||
+      (t.accountId && t.accountId.includes(currentUser.id)) ||
+      (t.id && t.id.includes(currentUser.id))
+    );
+  }, [transactions, currentUser.id, accounts]);
 
   const filteredTransactions = useMemo(() => {
     return userTransactions.filter(tx => {
@@ -46,16 +55,17 @@ export const TransactionsView: React.FC = () => {
       if (searchTerm.trim()) {
         const q = searchTerm.toLowerCase();
         const matchesDesc = tx.description.toLowerCase().includes(q);
+        const matchesSender = (tx.recipientOrSender || tx.sender || '').toLowerCase().includes(q);
         const matchesMerchant = tx.merchantName?.toLowerCase().includes(q);
         const matchesRef = tx.reference.toLowerCase().includes(q);
-        const matchesCat = tx.category.toLowerCase().includes(q);
-        if (!matchesDesc && !matchesMerchant && !matchesRef && !matchesCat) {
+        const matchesCat = (tx.category || tx.type || '').toLowerCase().includes(q);
+        if (!matchesDesc && !matchesSender && !matchesMerchant && !matchesRef && !matchesCat) {
           return false;
         }
       }
 
       // Category
-      if (selectedCategory !== 'ALL' && tx.category !== selectedCategory) {
+      if (selectedCategory !== 'ALL' && tx.category !== selectedCategory && tx.type !== selectedCategory) {
         return false;
       }
 
@@ -65,8 +75,11 @@ export const TransactionsView: React.FC = () => {
       }
 
       // Status
-      if (selectedStatus !== 'ALL' && tx.status !== selectedStatus) {
-        return false;
+      if (selectedStatus !== 'ALL') {
+        const isPostedOrCompleted = (selectedStatus === 'Completed' || selectedStatus === 'Posted') && (tx.status === 'Completed' || tx.status === 'Posted');
+        if (!isPostedOrCompleted && tx.status !== selectedStatus) {
+          return false;
+        }
       }
 
       return true;
@@ -232,8 +245,9 @@ export const TransactionsView: React.FC = () => {
             <thead>
               <tr className="bg-zinc-50/80 dark:bg-zinc-800/50 border-b border-zinc-200/80 dark:border-zinc-800 text-[11px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
                 <th className="py-3 px-4">Date & Time</th>
-                <th className="py-3 px-4">Description / Merchant</th>
-                <th className="py-3 px-4">Category</th>
+                <th className="py-3 px-4">Sender / Merchant</th>
+                <th className="py-3 px-4">Description</th>
+                <th className="py-3 px-4">Category / Type</th>
                 <th className="py-3 px-4">Account</th>
                 <th className="py-3 px-4 text-right">Amount</th>
                 <th className="py-3 px-4 text-center">Status</th>
@@ -243,83 +257,93 @@ export const TransactionsView: React.FC = () => {
             <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800/80 text-xs">
               {paginatedTransactions.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="py-12 text-center text-zinc-500 dark:text-zinc-400">
+                  <td colSpan={8} className="py-12 text-center text-zinc-500 dark:text-zinc-400">
                     No transactions found matching your criteria. Try adjusting your search filters.
                   </td>
                 </tr>
               ) : (
-                paginatedTransactions.map(tx => (
-                  <tr
-                    key={tx.id}
-                    onClick={() => setSelectedTx(tx)}
-                    className="hover:bg-zinc-50/80 dark:hover:bg-zinc-800/40 cursor-pointer transition-colors"
-                  >
-                    <td className="py-3.5 px-4 text-zinc-600 dark:text-zinc-400 whitespace-nowrap">
-                      {new Date(tx.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                      <span className="block text-[10px] text-zinc-400">
-                        {new Date(tx.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                      </span>
-                    </td>
+                paginatedTransactions.map(tx => {
+                  const senderName = tx.recipientOrSender || tx.sender || tx.merchantName || 'Feng Hong';
+                  const displayStatus = (tx.status === 'Completed' || tx.status === 'Posted') ? 'Posted' : tx.status;
+                  const displayType = tx.category || tx.type || 'Deposit';
 
-                    <td className="py-3.5 px-4 font-semibold text-zinc-900 dark:text-zinc-100">
-                      <div className="flex items-center gap-2.5">
-                        <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${
-                          tx.amount > 0 
-                            ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/50 dark:text-emerald-400' 
-                            : 'bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300'
-                        }`}>
-                          {tx.amount > 0 ? <ArrowDownLeft className="w-3.5 h-3.5" /> : <ArrowUpRight className="w-3.5 h-3.5" />}
+                  return (
+                    <tr
+                      key={tx.id}
+                      onClick={() => setSelectedTx(tx)}
+                      className="hover:bg-zinc-50/80 dark:hover:bg-zinc-800/40 cursor-pointer transition-colors"
+                    >
+                      <td className="py-3.5 px-4 text-zinc-600 dark:text-zinc-400 whitespace-nowrap">
+                        {new Date(tx.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                        <span className="block text-[10px] text-zinc-400">
+                          {new Date(tx.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </span>
+                      </td>
+
+                      <td className="py-3.5 px-4 font-semibold text-zinc-900 dark:text-zinc-100 whitespace-nowrap">
+                        <div className="flex items-center gap-2.5">
+                          <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${
+                            tx.amount > 0 
+                              ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/50 dark:text-emerald-400' 
+                              : 'bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300'
+                          }`}>
+                            {tx.amount > 0 ? <ArrowDownLeft className="w-3.5 h-3.5" /> : <ArrowUpRight className="w-3.5 h-3.5" />}
+                          </div>
+                          <div>
+                            <span className="font-bold text-zinc-900 dark:text-white">{senderName}</span>
+                            <span className="block text-[10px] text-zinc-400 font-mono font-normal">
+                              Ref: {tx.reference}
+                            </span>
+                          </div>
                         </div>
-                        <div>
-                          <span>{tx.description}</span>
-                          <span className="block text-[10px] text-zinc-400 font-mono font-normal">
-                            Ref: {tx.reference}
-                          </span>
-                        </div>
-                      </div>
-                    </td>
+                      </td>
 
-                    <td className="py-3.5 px-4 text-zinc-600 dark:text-zinc-300 whitespace-nowrap">
-                      <span className="px-2 py-0.5 rounded-md bg-zinc-100 dark:bg-zinc-800 text-[11px] font-medium">
-                        {tx.category}
-                      </span>
-                    </td>
+                      <td className="py-3.5 px-4 text-zinc-700 dark:text-zinc-300 max-w-[220px] truncate">
+                        {tx.description}
+                      </td>
 
-                    <td className="py-3.5 px-4 text-zinc-600 dark:text-zinc-400 whitespace-nowrap font-mono text-[11px]">
-                      {tx.accountName}
-                    </td>
+                      <td className="py-3.5 px-4 text-zinc-600 dark:text-zinc-300 whitespace-nowrap">
+                        <span className="px-2 py-0.5 rounded-md bg-zinc-100 dark:bg-zinc-800 text-[11px] font-medium">
+                          {displayType}
+                        </span>
+                      </td>
 
-                    <td className="py-3.5 px-4 text-right font-bold whitespace-nowrap">
-                      <span className={tx.amount > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-zinc-900 dark:text-white'}>
-                        {tx.amount > 0 ? '+' : '-'}{hideBalances ? '••••' : `$${Math.abs(tx.amount).toLocaleString(undefined, { minimumFractionDigits: 2 })}`}
-                      </span>
-                    </td>
+                      <td className="py-3.5 px-4 text-zinc-600 dark:text-zinc-400 whitespace-nowrap font-mono text-[11px]">
+                        {tx.accountName}
+                      </td>
 
-                    <td className="py-3.5 px-4 text-center whitespace-nowrap">
-                      <Badge 
-                        variant={
-                          tx.status === 'Completed' ? 'success' :
-                          tx.status === 'Pending' ? 'warning' :
-                          tx.status === 'Reversed' ? 'secondary' : 'destructive'
-                        }
-                      >
-                        {tx.status}
-                      </Badge>
-                    </td>
+                      <td className="py-3.5 px-4 text-right font-bold whitespace-nowrap">
+                        <span className={tx.amount > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-zinc-900 dark:text-white'}>
+                          {tx.amount > 0 ? '+' : '-'}{hideBalances ? '••••' : `$${Math.abs(tx.amount).toLocaleString(undefined, { minimumFractionDigits: 2 })}`}
+                        </span>
+                      </td>
 
-                    <td className="py-3.5 px-4 text-right whitespace-nowrap">
-                      <button
-                        onClick={e => {
-                          e.stopPropagation();
-                          setSelectedTx(tx);
-                        }}
-                        className="text-xs font-semibold text-zinc-600 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-white underline underline-offset-2"
-                      >
-                        Inspect
-                      </button>
-                    </td>
-                  </tr>
-                ))
+                      <td className="py-3.5 px-4 text-center whitespace-nowrap">
+                        <Badge 
+                          variant={
+                            displayStatus === 'Posted' || displayStatus === 'Completed' ? 'success' :
+                            displayStatus === 'Pending' ? 'warning' :
+                            displayStatus === 'Reversed' ? 'secondary' : 'destructive'
+                          }
+                        >
+                          {displayStatus}
+                        </Badge>
+                      </td>
+
+                      <td className="py-3.5 px-4 text-right whitespace-nowrap">
+                        <button
+                          onClick={e => {
+                            e.stopPropagation();
+                            setSelectedTx(tx);
+                          }}
+                          className="text-xs font-semibold text-zinc-600 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-white underline underline-offset-2"
+                        >
+                          Inspect
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })
               )}
             </tbody>
           </table>
@@ -373,8 +397,8 @@ export const TransactionsView: React.FC = () => {
                 {selectedTx.amount > 0 ? '+' : '-'}${Math.abs(selectedTx.amount).toLocaleString(undefined, { minimumFractionDigits: 2 })} {selectedTx.currency}
               </div>
               <div className="mt-2 flex justify-center">
-                <Badge variant={selectedTx.status === 'Completed' ? 'success' : selectedTx.status === 'Pending' ? 'warning' : 'neutral'}>
-                  {selectedTx.status}
+                <Badge variant={selectedTx.status === 'Completed' || selectedTx.status === 'Posted' ? 'success' : selectedTx.status === 'Pending' ? 'warning' : 'neutral'}>
+                  {selectedTx.status === 'Completed' ? 'Posted' : selectedTx.status}
                 </Badge>
               </div>
             </div>
@@ -382,28 +406,28 @@ export const TransactionsView: React.FC = () => {
             {/* Field Grid */}
             <div className="grid grid-cols-2 gap-4 text-xs">
               <div>
-                <span className="text-zinc-400 block">Merchant / Recipient</span>
-                <strong className="text-zinc-900 dark:text-zinc-100 text-sm">{selectedTx.merchantName || selectedTx.description}</strong>
+                <span className="text-zinc-400 block">Sender / Payee</span>
+                <strong className="text-zinc-900 dark:text-zinc-100 text-sm">{selectedTx.recipientOrSender || selectedTx.sender || selectedTx.merchantName || 'Feng Hong'}</strong>
               </div>
               <div>
                 <span className="text-zinc-400 block">Posted Date</span>
-                <strong className="text-zinc-900 dark:text-zinc-100 text-sm">{new Date(selectedTx.date).toLocaleString()}</strong>
+                <strong className="text-zinc-900 dark:text-zinc-100 text-sm">{new Date(selectedTx.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} ({new Date(selectedTx.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })})</strong>
+              </div>
+              <div>
+                <span className="text-zinc-400 block">Description</span>
+                <strong className="text-zinc-900 dark:text-zinc-100 text-xs">{selectedTx.description}</strong>
               </div>
               <div>
                 <span className="text-zinc-400 block">Account Ledger</span>
                 <strong className="text-zinc-900 dark:text-zinc-100 font-mono text-xs">{selectedTx.accountName}</strong>
               </div>
               <div>
-                <span className="text-zinc-400 block">Category</span>
-                <strong className="text-zinc-900 dark:text-zinc-100 text-xs">{selectedTx.category}</strong>
+                <span className="text-zinc-400 block">Transaction Type</span>
+                <strong className="text-zinc-900 dark:text-zinc-100 text-xs">{selectedTx.category || selectedTx.type || 'Deposit'}</strong>
               </div>
               <div>
-                <span className="text-zinc-400 block">Interchange Processing Fee</span>
-                <strong className="text-zinc-900 dark:text-zinc-100 text-xs">$0.00 (HSBC Premier Benefit)</strong>
-              </div>
-              <div>
-                <span className="text-zinc-400 block">Risk Evaluation Score</span>
-                <strong className="text-emerald-600 dark:text-emerald-400 text-xs">{selectedTx.riskScore || 'Low'} (Verified)</strong>
+                <span className="text-zinc-400 block">Processing Fee</span>
+                <strong className="text-zinc-900 dark:text-zinc-100 text-xs">$0.00 (HSBC Premier Free Deposit)</strong>
               </div>
             </div>
 
@@ -419,7 +443,7 @@ export const TransactionsView: React.FC = () => {
                 onClick={handlePrintReceipt}
                 className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 text-xs font-semibold"
               >
-                <Printer className="w-4 h-4" /> Print Simulated Receipt
+                <Printer className="w-4 h-4" /> Print Receipt
               </button>
 
               <button

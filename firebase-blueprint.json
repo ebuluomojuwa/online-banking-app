@@ -6,6 +6,9 @@
       "type": "object",
       "properties": {
         "id": { "type": "string", "description": "Unique user ID matching auth UID or user identifier" },
+        "name": { "type": "string", "description": "Full user name" },
+        "accountNumber": { "type": "string", "description": "Primary account number" },
+        "availableBalance": { "type": "number", "description": "Available cash balance in dollars" },
         "customerId": { "type": "string", "description": "Banking customer number" },
         "username": { "type": "string", "description": "Unique username" },
         "email": { "type": "string", "format": "email", "description": "User email address" },
