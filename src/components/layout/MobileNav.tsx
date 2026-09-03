@@ -19,7 +19,7 @@ import {
 } from 'lucide-react';
 import { useBanking } from '../../context/BankingContext';
 import { Badge } from '../ui';
-import { HsbcLogo } from '../common/HsbcLogo';
+import { NovaLogo } from '../common/NovaLogo';
 
 interface MobileNavProps {
   currentView: string;
@@ -111,7 +111,7 @@ export const MobileNav: React.FC<MobileNavProps> = ({ currentView, onNavigate })
           <div className="relative ml-auto w-4/5 max-w-sm h-full bg-[#140204] border-l border-[#38080E] p-6 flex flex-col justify-between overflow-y-auto shadow-2xl">
             <div>
               <div className="flex items-center justify-between pb-4 border-b border-[#38080E]">
-                <HsbcLogo size="sm" />
+                <NovaLogo size="sm" />
                 <button
                   onClick={() => setDrawerOpen(false)}
                   className="p-1.5 rounded-xl text-rose-400 hover:text-white"

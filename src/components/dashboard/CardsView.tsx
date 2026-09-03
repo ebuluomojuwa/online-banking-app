@@ -18,7 +18,7 @@ import {
 import { useBanking } from '../../context/BankingContext';
 import { Card } from '../../types';
 import { Badge, Modal } from '../ui';
-import { HsbcLogo, HsbcSymbol } from '../common/HsbcLogo';
+import { NovaLogo, NovaSymbol } from '../common/NovaLogo';
 
 export const CardsView: React.FC = () => {
   const { cards, currentUser, toggleFreezeCard, updateCardLimits, replaceCard } = useBanking();
@@ -82,7 +82,7 @@ export const CardsView: React.FC = () => {
                     : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-white'
                 }`}
               >
-                {c.tier.replace('Nova ', '').replace('HSBC ', '')}
+                {c.tier.replace('Nova ', '')}
               </button>
             ))}
           </div>
@@ -116,7 +116,7 @@ export const CardsView: React.FC = () => {
                   </div>
 
                   <div className="flex flex-col items-end">
-                    <HsbcLogo size="sm" />
+                    <NovaLogo size="sm" />
                     <span className="block text-[8px] uppercase tracking-widest text-zinc-400 font-sans mt-0.5">
                       {activeCard.tier}
                     </span>
@@ -384,7 +384,7 @@ export const CardsView: React.FC = () => {
               </div>
               <div className="flex justify-between">
                 <span className="text-zinc-500">Replacement Fee:</span>
-                <strong className="text-emerald-600 dark:text-emerald-400">$0.00 (HSBC Premier Complimentary)</strong>
+                <strong className="text-emerald-600 dark:text-emerald-400">$0.00 (Nova Premier Complimentary)</strong>
               </div>
             </div>
 

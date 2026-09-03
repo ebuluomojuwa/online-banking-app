@@ -138,7 +138,7 @@ export const TransactionsView: React.FC = () => {
               const encodedUri = encodeURI(csvContent);
               const link = document.createElement("a");
               link.setAttribute("href", encodedUri);
-              link.setAttribute("download", `hsbc_bank_statement_${new Date().toISOString().slice(0,10)}.csv`);
+              link.setAttribute("download", `nova_bank_statement_${new Date().toISOString().slice(0,10)}.csv`);
               document.body.appendChild(link);
               link.click();
               document.body.removeChild(link);
@@ -429,7 +429,7 @@ export const TransactionsView: React.FC = () => {
               </div>
               <div>
                 <span className="text-zinc-400 block">Processing Fee</span>
-                <strong className="text-zinc-900 dark:text-zinc-100 text-xs">$0.00 (HSBC Premier Free Deposit)</strong>
+                <strong className="text-zinc-900 dark:text-zinc-100 text-xs">$0.00 (Nova Premier Free Deposit)</strong>
               </div>
             </div>
 

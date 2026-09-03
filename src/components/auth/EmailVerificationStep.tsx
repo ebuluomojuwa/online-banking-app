@@ -184,8 +184,11 @@ export const EmailVerificationStep: React.FC<EmailVerificationStepProps> = ({
 
           <div className="text-xs space-y-1">
             <div className="flex items-center justify-between text-rose-300/90 text-[11px]">
-              <span><strong>From:</strong> HSBC Security &lt;auth@hsbc.secure&gt;</span>
+              <span><strong>From:</strong> Nova Demo Security &lt;demo@novabank.demo&gt;</span>
               <span><strong>To:</strong> {email}</span>
+            </div>
+            <div className="text-[10px] text-amber-400/90 font-medium">
+              Simulation Sandbox OTP (No actual email is sent):
             </div>
             <div className="p-2 rounded-xl bg-black/40 border border-rose-800/30 flex items-center justify-between gap-3">
               <div>

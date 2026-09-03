@@ -28,7 +28,7 @@ export const SecurityView: React.FC = () => {
   // Active Sessions
   const [sessions, setSessions] = useState([
     { id: 'sess-1', device: 'Apple MacBook Pro M3 Max', location: 'New York, USA', ip: '192.0.2.45', current: true, lastActive: 'Just now' },
-    { id: 'sess-2', device: 'Apple iPhone 16 Pro (HSBC App)', location: 'New York, USA', ip: '198.51.100.12', current: false, lastActive: '2 hours ago' },
+    { id: 'sess-2', device: 'Apple iPhone 16 Pro (Nova App)', location: 'New York, USA', ip: '198.51.100.12', current: false, lastActive: '2 hours ago' },
     { id: 'sess-3', device: 'iPad Pro 13-inch', location: 'Boston, USA', ip: '203.0.113.88', current: false, lastActive: '3 days ago' },
   ]);
 
@@ -198,7 +198,7 @@ export const SecurityView: React.FC = () => {
               Active Authorized Sessions
             </h2>
             <p className="text-xs text-rose-300/70">
-              Devices currently authenticated to your HSBC digital banking portal
+              Devices currently authenticated to your Nova digital banking portal
             </p>
           </div>
 

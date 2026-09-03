@@ -10,18 +10,11 @@ import {
   LogOut, 
   User, 
   ChevronDown, 
-  SlidersHorizontal,
-  CheckCircle2,
-  AlertTriangle,
-  HelpCircle,
-  Sparkles,
-  Database,
-  RefreshCw,
-  Check
+  SlidersHorizontal
 } from 'lucide-react';
 import { useBanking } from '../../context/BankingContext';
 import { Badge } from '../ui';
-import { HsbcLogo } from '../common/HsbcLogo';
+import { NovaLogo } from '../common/NovaLogo';
 
 interface NavbarProps {
   onOpenSearch: () => void;
@@ -33,8 +26,6 @@ interface NavbarProps {
 export const Navbar: React.FC<NavbarProps> = ({ onOpenSearch, onNavigate, onGoToLanding, currentView = 'dashboard' }) => {
   const { 
     currentUser, 
-    allUsers, 
-    switchUser, 
     isAuthenticated, 
     logout, 
     hideBalances, 
@@ -45,104 +36,25 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSearch, onNavigate, onGoTo
     notifications,
     unreadNotificationCount,
     markNotificationRead,
-    markAllNotificationsRead,
-    resetAllDemoData,
-    syncToFirestoreNow
+    markAllNotificationsRead
   } = useBanking();
 
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showNotifMenu, setShowNotifMenu] = useState(false);
-  const [showRoleSwitcher, setShowRoleSwitcher] = useState(false);
-  const [isSyncing, setIsSyncing] = useState(false);
-  const [syncSuccessMessage, setSyncSuccessMessage] = useState('');
-
-  const handleManualSync = async () => {
-    setIsSyncing(true);
-    const res = await syncToFirestoreNow();
-    setIsSyncing(false);
-    if (res.success) {
-      setSyncSuccessMessage(`Synced ${res.totalSynced} items`);
-      setTimeout(() => setSyncSuccessMessage(''), 3000);
-    }
-  };
 
   const recentNotifications = notifications.slice(0, 4);
 
   return (
     <header className="sticky top-0 z-40 w-full bg-[#0E0103]/95 backdrop-blur-md border-b border-[#38080E] transition-colors">
-      {/* Top Demo Banner */}
-      <div className="bg-[#0B0102] text-rose-300/80 text-xs px-4 py-1.5 flex items-center justify-between border-b border-[#38080E]/80">
-        <div className="flex items-center gap-2 max-w-7xl mx-auto w-full justify-between">
-          <div className="flex items-center gap-2">
-            <span className="flex h-2 w-2 relative">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-            </span>
-            <span className="font-bold tracking-widest text-emerald-400 uppercase text-[10px]">
-              SYSTEM OPERATIONAL
-            </span>
-            <span className="hidden sm:inline text-rose-300/60">
-              • Simulated Financial Prototype
-            </span>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <button
-              onClick={handleManualSync}
-              disabled={isSyncing}
-              className="text-[11px] font-medium text-rose-200 hover:text-emerald-300 transition-colors flex items-center gap-1 bg-[#1C0407] hover:bg-[#25060A] px-2 py-0.5 rounded-lg border border-rose-800/40"
-              title="Push all database collections to Firebase Cloud Firestore"
-            >
-              {isSyncing ? (
-                <>
-                  <RefreshCw className="w-3 h-3 text-emerald-400 animate-spin" />
-                  <span className="text-emerald-300">Syncing to Firebase...</span>
-                </>
-              ) : syncSuccessMessage ? (
-                <>
-                  <Check className="w-3 h-3 text-emerald-400" />
-                  <span className="text-emerald-300 font-bold">{syncSuccessMessage}</span>
-                </>
-              ) : (
-                <>
-                  <Database className="w-3 h-3 text-rose-400" />
-                  <span>Sync to Firebase</span>
-                </>
-              )}
-            </button>
-            <div className="h-3 w-px bg-[#38080E]" />
-            <button
-              onClick={resetAllDemoData}
-              className="text-[11px] text-rose-300/70 hover:text-white transition-colors underline underline-offset-2 flex items-center gap-1"
-              title="Reset all balances and mock records to initial state"
-            >
-              Reset Seed
-            </button>
-            <div className="h-3 w-px bg-[#38080E]" />
-            <button
-              onClick={() => setShowRoleSwitcher(prev => !prev)}
-              className="text-[11px] font-medium text-rose-200 hover:text-emerald-400 transition-colors flex items-center gap-1.5 bg-[#1C0407] px-2 py-0.5 rounded-lg border border-[#38080E]"
-            >
-              <Sparkles className="w-3 h-3 text-emerald-400" />
-              <span>Persona: <strong className="text-white">{currentUser.firstName} ({currentUser.role})</strong></span>
-              <ChevronDown className="w-3 h-3 text-rose-400" />
-            </button>
-          </div>
-        </div>
-      </div>
-
       {/* Main Navbar */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between gap-4">
         {/* Brand Logo */}
         <div className="flex items-center gap-6">
           <button 
             onClick={() => onNavigate(isAuthenticated ? 'dashboard' : 'home')}
-            className="flex items-center gap-3 text-left group focus:outline-none"
+            className="flex items-center text-left group focus:outline-none"
           >
-            <HsbcLogo size="md" />
-            <span className="text-[9px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded-md bg-rose-500/15 text-rose-300 border border-rose-500/30">
-              PREMIER
-            </span>
+            <NovaLogo size="md" />
           </button>
 
           {/* Navigation Links for Public View */}
@@ -293,10 +205,10 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSearch, onNavigate, onGoTo
               >
                 <div className="text-right hidden sm:block">
                   <div className="text-sm font-semibold text-white leading-tight">
-                    {(currentUser.firstName || 'Premier')} {(currentUser.lastName || 'Client')}
+                    {(currentUser.firstName || 'Private')} {(currentUser.lastName || 'Client')}
                   </div>
-                  <div className="text-[10px] text-rose-300/70 font-bold uppercase tracking-wider">
-                    {currentUser.role === 'ADMIN' ? 'ADMIN COMMAND' : 'PREMIER CLIENT'}
+                  <div className="text-[10px] text-rose-300/70 font-medium uppercase tracking-wider">
+                    {currentUser.role === 'ADMIN' ? 'ADMIN' : 'PRIVATE CLIENT'}
                   </div>
                 </div>
                 <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-rose-600 to-amber-600 flex items-center justify-center text-white font-bold text-xs shadow-xs border border-rose-400/30">
@@ -310,7 +222,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSearch, onNavigate, onGoTo
                 <div className="absolute right-0 mt-2 w-60 bg-[#200508] rounded-3xl shadow-2xl border border-[#38080E] py-3 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
                   <div className="px-5 py-2 border-b border-[#38080E]">
                     <p className="text-xs font-bold text-white">{currentUser.firstName} {currentUser.lastName}</p>
-                    <p className="text-[11px] text-rose-300/70 font-mono">@{currentUser.username || 'premier.client'}</p>
+                    <p className="text-[11px] text-rose-300/70 font-mono">@{currentUser.username || 'client'}</p>
                     <div className="mt-2">
                       <Badge variant={currentUser.role === 'ADMIN' ? 'warning' : 'secondary'}>
                         {currentUser.role}
@@ -388,70 +300,6 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSearch, onNavigate, onGoTo
         </div>
       </div>
 
-      {/* Role Switcher Modal */}
-      {showRoleSwitcher && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xs">
-          <div className="w-full max-w-md bg-[#200508] rounded-3xl p-6 shadow-2xl border border-[#38080E]">
-            <div className="flex items-center justify-between pb-3 border-b border-[#38080E]">
-              <div className="flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-emerald-400" />
-                <h3 className="font-bold text-white">Persona Switcher</h3>
-              </div>
-              <button 
-                onClick={() => setShowRoleSwitcher(false)}
-                className="text-rose-400 hover:text-white"
-              >
-                ✕
-              </button>
-            </div>
-            <p className="text-xs text-rose-300/80 mt-2 mb-4">
-              Select any pre-configured fictional persona to evaluate banking, card controls, or institutional audit workflows:
-            </p>
-
-            <div className="space-y-2.5">
-              {allUsers.map(user => (
-                <div
-                  key={user.id}
-                  onClick={() => {
-                    switchUser(user.id);
-                    setShowRoleSwitcher(false);
-                    if (user.role === 'ADMIN') {
-                      onNavigate('admin-dashboard');
-                    } else {
-                      onNavigate('dashboard');
-                    }
-                  }}
-                  className={`p-3.5 rounded-2xl border cursor-pointer transition-all flex items-center justify-between ${
-                    user.id === currentUser.id
-                      ? 'border-rose-500/50 bg-rose-500/15 shadow-xs'
-                      : 'border-[#38080E] hover:bg-[#2B070B]'
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-rose-500/20 border border-rose-500/30 flex items-center justify-center text-rose-300 font-bold text-xs">
-                      {user.firstName.charAt(0)}{user.lastName.charAt(0)}
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-semibold text-white">
-                          {user.firstName} {user.lastName}
-                        </span>
-                        {user.id === currentUser.id && (
-                          <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                        )}
-                      </div>
-                      <span className="text-xs text-rose-300/70">{user.email}</span>
-                    </div>
-                  </div>
-                  <Badge variant={user.role === 'ADMIN' ? 'warning' : 'secondary'}>
-                    {user.role}
-                  </Badge>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
     </header>
   );
 };

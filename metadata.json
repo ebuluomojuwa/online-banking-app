@@ -1,6 +1,6 @@
 {
-  "name": "HSBC",
-  "description": "HSBC Digital Banking Portal prototype featuring public showcase, customer dashboard, transactions, simulated transfers, cards, analytics, savings, bills, loans, security center, and administrative risk management.",
+  "name": "Nova Digital Banking Demo",
+  "description": "Interactive digital banking simulation and portfolio demonstration. Built for testing, UI/UX evaluation, and software architecture evaluation. Not affiliated with any real financial institution and does not collect real financial credentials.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

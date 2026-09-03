@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 import { useBanking } from '../../context/BankingContext';
 import { findUserByEmailOrUsername } from '../../lib/firestoreService';
-import { HsbcLogo } from '../common/HsbcLogo';
+import { NovaLogo } from '../common/NovaLogo';
 import { EmailVerificationStep } from './EmailVerificationStep';
 
 interface AuthGatewayProps {
@@ -169,17 +169,12 @@ export const AuthGateway: React.FC<AuthGatewayProps> = ({
       <header className="border-b border-[#38080E] bg-[#0E0103]/80 backdrop-blur-md px-6 py-4">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <HsbcLogo size="md" />
-            <div className="hidden sm:block border-l border-[#38080E] pl-3">
-              <span className="text-[10px] text-rose-300/70 font-mono tracking-widest uppercase">
-                Premier Digital Banking
-              </span>
-            </div>
+            <NovaLogo size="md" />
           </div>
           <div className="flex items-center gap-2 text-xs text-rose-300/80 bg-[#1C0407] px-3 py-1.5 rounded-full border border-[#38080E]">
             <Lock className="w-3.5 h-3.5 text-emerald-400" />
-            <span className="text-[11px] font-medium hidden xs:inline">256-Bit TLS Authentication</span>
-            <span className="text-[11px] font-medium xs:hidden">Secure Gateway</span>
+            <span className="text-[11px] font-medium hidden xs:inline">Secure 256-Bit SSL Encrypted</span>
+            <span className="text-[11px] font-medium xs:hidden">Secure SSL</span>
           </div>
         </div>
       </header>
@@ -188,6 +183,17 @@ export const AuthGateway: React.FC<AuthGatewayProps> = ({
       <main className="flex-1 flex items-center justify-center p-4 sm:p-6 lg:p-8">
         <div className="w-full max-w-lg bg-[#1C0407]/90 border border-[#38080E] rounded-3xl shadow-2xl backdrop-blur-xl p-6 sm:p-8 space-y-6 animate-in fade-in zoom-in-95 duration-200">
           
+          {/* Safe Browsing Demo Disclaimer Banner */}
+          <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/25 text-amber-300 text-xs flex items-start gap-2.5 text-left">
+            <AlertCircle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+            <div className="space-y-0.5">
+              <div className="font-bold text-amber-200">Interactive Portfolio Demonstration</div>
+              <div className="text-[11px] text-amber-300/80 leading-relaxed">
+                This portal is an interactive simulation and does not collect real banking credentials, passwords, or personal data. Use demo accounts or sample values.
+              </div>
+            </div>
+          </div>
+
           {/* Mode Switcher Tabs */}
           <div className="grid grid-cols-2 p-1 bg-[#0E0103] rounded-2xl border border-[#38080E]">
             <button
@@ -229,12 +235,24 @@ export const AuthGateway: React.FC<AuthGatewayProps> = ({
             <div className="space-y-5">
               <div className="text-left space-y-1">
                 <h1 className="text-xl font-bold text-white tracking-tight">
-                  Welcome to HSBC Online Banking
+                  Welcome to Nova Demo Banking
                 </h1>
                 <p className="text-xs text-rose-300/70 leading-relaxed">
-                  Enter your username or email address and password to access your secure banking portal.
+                  Enter test credentials to explore the customer dashboard simulation.
                 </p>
               </div>
+
+              {/* Quick autofill helper */}
+              <button
+                type="button"
+                onClick={() => {
+                  setIdentifier('gregorio.lind@example.com');
+                  setPassword('Password123!');
+                }}
+                className="w-full py-2 bg-amber-500/15 hover:bg-amber-500/25 text-amber-200 font-bold text-xs rounded-xl transition-colors border border-amber-500/30 flex items-center justify-center gap-1.5"
+              >
+                <span>Fill Demo Credentials (Gregorio Lind)</span>
+              </button>
 
               {signInError && (
                 <div className="p-3 rounded-xl bg-rose-950/80 text-rose-300 border border-rose-800/80 flex items-center gap-2 text-xs animate-in fade-in duration-150">
@@ -246,7 +264,7 @@ export const AuthGateway: React.FC<AuthGatewayProps> = ({
               <form onSubmit={handleSignIn} className="space-y-4">
                 <div className="space-y-1.5 text-left">
                   <label className="block font-bold text-rose-200 text-xs">
-                    Username or Email Address
+                    Demo Username or Email Address
                   </label>
                   <div className="relative">
                     <User className="w-4 h-4 absolute left-3 top-3 text-rose-400/60" />
@@ -268,9 +286,9 @@ export const AuthGateway: React.FC<AuthGatewayProps> = ({
                 <div className="space-y-1.5 text-left">
                   <div className="flex justify-between items-center">
                     <label className="font-bold text-rose-200 text-xs">
-                      Password
+                      Demo Password
                     </label>
-                    <span className="text-[10px] text-rose-400/60 font-mono">Encrypted TLS</span>
+                    <span className="text-[10px] text-rose-400/60 font-mono">Demo Session</span>
                   </div>
                   <div className="relative">
                     <Lock className="w-4 h-4 absolute left-3 top-3 text-rose-400/60" />
@@ -279,7 +297,7 @@ export const AuthGateway: React.FC<AuthGatewayProps> = ({
                       type={showPassword ? 'text' : 'password'}
                       value={password}
                       onChange={e => setPassword(e.target.value)}
-                      placeholder="Enter your password"
+                      placeholder="Enter demo password"
                       required
                       className="w-full pl-9 pr-10 py-2.5 bg-[#0E0103] border border-[#38080E] rounded-xl text-white placeholder-rose-400/40 focus:outline-none focus:border-rose-500 text-xs transition-colors"
                     />
@@ -307,7 +325,7 @@ export const AuthGateway: React.FC<AuthGatewayProps> = ({
                   ) : (
                     <>
                       <ShieldCheck className="w-4 h-4" />
-                      <span>Sign In to Account</span>
+                      <span>Sign In to Demo Portal</span>
                       <ArrowRight className="w-4 h-4" />
                     </>
                   )}
@@ -325,7 +343,7 @@ export const AuthGateway: React.FC<AuthGatewayProps> = ({
                   }}
                   className="font-bold text-rose-200 hover:text-white underline underline-offset-2 ml-1"
                 >
-                  Open an Account
+                  Open Demo Account
                 </button>
               </div>
             </div>
@@ -341,10 +359,10 @@ export const AuthGateway: React.FC<AuthGatewayProps> = ({
                   </div>
                   <div className="space-y-1">
                     <h3 className="text-lg font-bold text-white">
-                      Account Provisioned Successfully!
+                      Demo Account Provisioned Successfully!
                     </h3>
                     <p className="text-xs text-rose-300/70 max-w-xs mx-auto">
-                      Identity & email verified, $10,000 opening credit applied. Entering secure banking portal...
+                      Demo identity verified, $10,000 opening test credit applied. Entering simulated banking portal...
                     </p>
                   </div>
                 </div>
@@ -370,10 +388,10 @@ export const AuthGateway: React.FC<AuthGatewayProps> = ({
                 <>
                   <div className="text-left space-y-1">
                     <h1 className="text-xl font-bold text-white tracking-tight">
-                      Open an HSBC Premier Account
+                      Open a Nova Demo Account
                     </h1>
                     <p className="text-xs text-rose-300/70 leading-relaxed">
-                      Instant digital onboarding with email security verification and automated funding.
+                      Interactive digital onboarding with simulated email verification and test balance.
                     </p>
                   </div>
 
@@ -500,9 +518,9 @@ export const AuthGateway: React.FC<AuthGatewayProps> = ({
                         onChange={e => setRegAccountType(e.target.value as any)}
                         className="w-full p-2.5 bg-[#0E0103] border border-[#38080E] rounded-xl text-white focus:outline-none focus:border-rose-500 text-xs"
                       >
-                        <option value="CHECKING">HSBC Premier Checking ($0 Fee + $10,000 Opening Credit)</option>
-                        <option value="SAVINGS">High-Yield Reserve Savings (4.75% APY)</option>
-                        <option value="BUSINESS">Commercial Executive Vault</option>
+                        <option value="CHECKING">Nova Premier Checking (Demo - $0 Fee + $10,000 Opening Credit)</option>
+                        <option value="SAVINGS">High-Yield Reserve Savings (Demo 4.75% APY)</option>
+                        <option value="BUSINESS">Commercial Executive Vault (Demo)</option>
                       </select>
                     </div>
 
@@ -533,7 +551,7 @@ export const AuthGateway: React.FC<AuthGatewayProps> = ({
                   </form>
 
                   <div className="pt-2 text-center text-xs text-rose-300/70">
-                    Already registered with HSBC?{' '}
+                    Already registered with Nova Demo?{' '}
                     <button
                       id="link-switch-to-signin"
                       type="button"
@@ -557,8 +575,8 @@ export const AuthGateway: React.FC<AuthGatewayProps> = ({
       {/* Footer Credentials */}
       <footer className="border-t border-[#38080E] bg-[#0E0103]/80 px-6 py-4 text-center text-xs text-rose-400/60">
         <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
-          <span>HSBC Global Digital Banking • Encrypted Premier Portal</span>
-          <span>Zero-Liability Security Protected</span>
+          <span>Nova Digital Banking • Interactive Demonstration Sandbox</span>
+          <span>Simulation Showcase • No Real Financial Services</span>
         </div>
       </footer>
     </div>

@@ -46,7 +46,7 @@ const BankingAppInner: React.FC = () => {
       <div className="min-h-screen bg-[#140204] text-[#FFF1F2] flex flex-col items-center justify-center space-y-4">
         <div className="w-10 h-10 border-3 border-rose-500 border-t-transparent rounded-full animate-spin" />
         <div className="text-xs text-rose-300/80 font-medium tracking-wide">
-          Verifying HSBC Secure Session...
+          Verifying Nova Demo Session...
         </div>
       </div>
     );
@@ -173,22 +173,6 @@ const BankingAppInner: React.FC = () => {
 
         {/* Content Container */}
         <main className="flex-1 p-4 sm:p-6 lg:p-8 pb-24 md:pb-12 min-w-0">
-          {/* Prototype Watermark Notice */}
-          <div className="mb-6 p-3 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-200 text-xs flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
-              <span>
-                <strong>HSBC Digital Banking Prototype:</strong> Demonstration with simulated local persistence.
-              </span>
-            </div>
-            <button
-              onClick={() => setIsLandingMode(true)}
-              className="text-[10px] font-bold text-rose-400 hover:underline uppercase tracking-wider hidden sm:inline-block"
-            >
-              View Public Website
-            </button>
-          </div>
-
           {renderCurrentView()}
         </main>
       </div>
@@ -197,14 +181,14 @@ const BankingAppInner: React.FC = () => {
       <footer className="border-t border-[#38080E] bg-[#0E0103]/80 px-6 sm:px-10 py-3 flex items-center justify-between text-xs text-rose-300/70 transition-colors">
         <div className="flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-          <span className="text-rose-200">HSBC Global Gateway Active</span>
+          <span className="text-rose-200">Nova Demo Gateway Active</span>
         </div>
         <div className="text-[11px] text-rose-400/80 hidden sm:block">
-          HSBC Digital Banking • Global Prototype Network
+          Nova Digital Banking • Interactive Demonstration Sandbox
         </div>
         <div className="flex items-center gap-4">
           <span className="bg-rose-500/15 text-rose-300 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border border-rose-500/30">
-            Demo Environment Only
+            Demo Portal (No Real Funds)
           </span>
         </div>
       </footer>

@@ -267,7 +267,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({ onNavigate
                   {currentUser.firstName} {currentUser.lastName}
                 </h1>
                 <Badge variant="danger" className="text-[10px] uppercase font-bold py-0.5 px-2">
-                  {currentUser.role === 'ADMIN' ? 'System Administrator' : currentUser.role === 'SUPPORT_AGENT' ? 'Support Specialist' : 'Premier Client'}
+                  {currentUser.role === 'ADMIN' ? 'System Administrator' : currentUser.role === 'SUPPORT_AGENT' ? 'Support Specialist' : 'Private Client'}
                 </Badge>
                 <div className="flex items-center gap-1 text-[11px] text-emerald-400 bg-emerald-950/60 border border-emerald-800/60 px-2 py-0.5 rounded-lg">
                   <ShieldCheck className="w-3.5 h-3.5" />
@@ -293,7 +293,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({ onNavigate
                 <p className="text-xs font-semibold text-rose-100">{primaryAccount.name}</p>
                 <div className="flex items-center gap-2 mt-0.5">
                   <span className="font-mono text-xs text-rose-300 font-bold">
-                    {showFullAccount ? `HSBC-${primaryAccount.accountNumber}` : `•••• ${primaryAccount.accountNumber}`}
+                    {showFullAccount ? `NOVA-${primaryAccount.accountNumber}` : `•••• ${primaryAccount.accountNumber}`}
                   </span>
                   <button
                     onClick={() => setShowFullAccount(p => !p)}
@@ -496,7 +496,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({ onNavigate
               </div>
             ) : (
               <div className="mt-4 p-3 bg-[#0E0103] rounded-xl border border-[#38080E] text-center text-xs text-rose-300/70">
-                No credit cards linked. Apply for an HSBC World Elite card today.
+                No credit cards linked. Apply for a Nova Sapphire card today.
               </div>
             )}
           </div>
@@ -521,7 +521,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({ onNavigate
               Customer Accounts & Portfolios
             </h3>
             <p className="text-xs text-rose-300/70">
-              Active Premier banking accounts and portfolios
+              Active private banking accounts and portfolios
             </p>
           </div>
           <button

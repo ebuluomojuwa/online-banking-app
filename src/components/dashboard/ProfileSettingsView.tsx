@@ -1,23 +1,17 @@
 import React, { useState } from 'react';
 import { 
   User, 
-  Mail, 
-  Phone, 
   ShieldCheck, 
-  RotateCcw, 
   CheckCircle2, 
-  Sparkles,
-  Lock,
-  Key,
-  Calendar,
-  AlertCircle
+  Lock, 
+  Key
 } from 'lucide-react';
 import { useBanking } from '../../context/BankingContext';
 import { Badge } from '../ui';
 import { ChangePasswordForm } from './ChangePasswordForm';
 
 export const ProfileSettingsView: React.FC = () => {
-  const { currentUser, switchUser, users, resetAllData } = useBanking();
+  const { currentUser } = useBanking();
 
   const [firstName, setFirstName] = useState(currentUser.firstName);
   const [lastName, setLastName] = useState(currentUser.lastName);
@@ -60,7 +54,7 @@ export const ProfileSettingsView: React.FC = () => {
           </div>
           <p className="text-xs text-rose-300/80">{currentUser.email}</p>
           <div className="text-[11px] text-rose-400/70 pt-1">
-            Member Since: {new Date(currentUser.memberSince || currentUser.createdAt || Date.now()).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })} • Customer ID: #{currentUser.customerId || (currentUser.id ? currentUser.id.slice(0, 6).toUpperCase() : 'HSBC-PREMIER')}
+            Member Since: {new Date(currentUser.memberSince || currentUser.createdAt || Date.now()).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })} • Customer ID: #{currentUser.customerId || (currentUser.id ? currentUser.id.slice(0, 6).toUpperCase() : 'NOVA-PREMIER')}
           </div>
         </div>
       </div>
@@ -164,59 +158,6 @@ export const ProfileSettingsView: React.FC = () => {
           </button>
         </div>
       </form>
-
-      {/* Persona Switcher Box (for Demo testing) */}
-      <div className="bg-[#1C0407] border border-[#38080E] p-6 rounded-3xl space-y-3">
-        <div className="flex items-center gap-2">
-          <Sparkles className="w-4 h-4 text-amber-400" />
-          <h3 className="text-xs font-bold text-amber-300 uppercase tracking-wider">
-            Simulation Persona Switcher
-          </h3>
-        </div>
-        <p className="text-xs text-rose-300/70">
-          Switch between simulated customer and administrative staff accounts to evaluate different permission tiers:
-        </p>
-
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
-          {users.map(u => (
-            <button
-              key={u.id}
-              onClick={() => switchUser(u.id)}
-              className={`p-3 rounded-2xl border text-left transition-all text-xs ${
-                u.id === currentUser.id
-                  ? 'border-rose-500 bg-rose-500/10 shadow-xs ring-2 ring-rose-500/20'
-                  : 'border-[#38080E] bg-[#0E0103] hover:border-rose-500/40'
-              }`}
-            >
-              <div className="font-bold text-white">{u.firstName} {u.lastName}</div>
-              <div className="text-[10px] text-rose-400/70 uppercase font-semibold mt-0.5">{u.role}</div>
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Danger Zone: Reset Mock Data */}
-      <div className="bg-rose-500/5 rounded-3xl border border-rose-500/20 p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h3 className="text-xs font-bold text-rose-400 uppercase tracking-wider">
-            Reset Prototype Storage
-          </h3>
-          <p className="text-xs text-rose-300/70 mt-0.5">
-            Clear customized local records and re-seed with fresh default accounts.
-          </p>
-        </div>
-
-        <button
-          onClick={() => {
-            if (window.confirm('Reset all demo state to fresh mock seed data?')) {
-              resetAllData();
-            }
-          }}
-          className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-xs shrink-0"
-        >
-          <RotateCcw className="w-3.5 h-3.5" /> Re-Seed Prototype Data
-        </button>
-      </div>
     </div>
   );
 };

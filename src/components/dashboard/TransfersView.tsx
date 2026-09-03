@@ -127,7 +127,7 @@ export const TransfersView: React.FC = () => {
   const handleConfirmTransfer = async () => {
     setIsSubmitting(true);
     try {
-      const generatedRef = reference.trim() || `TRF-HSBC-${Date.now().toString().slice(-6)}`;
+      const generatedRef = reference.trim() || `TRF-NOVA-${Date.now().toString().slice(-6)}`;
       const result = await transferFunds({
         fromAccountId: selectedSourceAccount.id,
         recipientName: recipientSummary.name,
@@ -185,7 +185,7 @@ export const TransfersView: React.FC = () => {
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
           { id: 'INTERNAL', label: 'Between My Accounts', icon: ArrowLeftRight, desc: 'Instant & Free' },
-          { id: 'OTHER_CUSTOMER', label: 'HSBC Customer', icon: SendHorizontal, desc: 'Direct Peer Routing' },
+          { id: 'OTHER_CUSTOMER', label: 'Nova Customer', icon: SendHorizontal, desc: 'Direct Peer Routing' },
           { id: 'DOMESTIC_WIRE', label: 'External ACH / Wire', icon: Building, desc: '1-2 Business Days' },
           { id: 'INTERNATIONAL_SWIFT', label: 'SWIFT International', icon: Globe2, desc: 'Global Currencies' },
         ].map(tab => {
@@ -449,9 +449,9 @@ export const TransfersView: React.FC = () => {
           <div className="p-4 bg-zinc-50 dark:bg-zinc-800/50 rounded-2xl border border-zinc-100 dark:border-zinc-800 flex items-center justify-between text-xs">
             <div className="flex items-center gap-2 text-zinc-600 dark:text-zinc-400">
               <ShieldCheck className="w-4 h-4 text-emerald-500" />
-              <span>Simulated Prototype Transfer Fee:</span>
+              <span>Transfer Processing Fee:</span>
             </div>
-            <strong className="text-emerald-600 dark:text-emerald-400 font-bold">$0.00 (HSBC Zero-Fee Tier)</strong>
+            <strong className="text-emerald-600 dark:text-emerald-400 font-bold">$0.00 (Nova Zero-Fee Tier)</strong>
           </div>
 
           {/* Submit Button */}
@@ -523,7 +523,7 @@ export const TransfersView: React.FC = () => {
             </div>
 
             <div className="p-3 bg-amber-50 dark:bg-amber-950/30 rounded-xl text-[11px] text-amber-800 dark:text-amber-400 border border-amber-200 dark:border-amber-900">
-              ⚡ Fictional Prototype Mode: Simulated balances will update immediately in your dashboard.
+              ⚡ Instant Demo Settlement: Balances will update immediately in your customer dashboard.
             </div>
 
             <div className="flex items-center justify-end gap-3 pt-2">
@@ -554,7 +554,7 @@ export const TransfersView: React.FC = () => {
           isOpen={!!transferSuccessData}
           onClose={() => setTransferSuccessData(null)}
           title="Transfer Executed Successfully"
-          description="Your simulated transaction has posted and balances have been adjusted."
+          description="Your demo transfer has posted and balances have been updated."
         >
           <div className="text-center py-4 space-y-4">
             <div className="w-14 h-14 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto">

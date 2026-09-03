@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 import { useBanking, isWelcomeCreditTransaction } from '../../context/BankingContext';
 import { Badge, Modal } from '../ui';
-import { HsbcLogo } from '../common/HsbcLogo';
+import { NovaLogo } from '../common/NovaLogo';
 
 export const StatementsView: React.FC = () => {
   const { accounts, transactions, currentUser } = useBanking();
@@ -151,7 +151,7 @@ export const StatementsView: React.FC = () => {
         <Modal
           isOpen={showStatementPreview}
           onClose={() => setShowStatementPreview(false)}
-          title={`HSBC Official Statement - ${selectedMonth}`}
+          title={`Nova Demo Statement - ${selectedMonth}`}
           description={`Account: ${selectedAccount.name} (**${selectedAccount.accountNumber})`}
         >
           <div className="space-y-6 text-xs print:p-0">
@@ -160,10 +160,10 @@ export const StatementsView: React.FC = () => {
               <div className="flex justify-between items-start border-b border-zinc-200 dark:border-zinc-800 pb-4">
                 <div>
                   <div className="flex items-center gap-2">
-                    <HsbcLogo size="sm" textColor="text-zinc-900 dark:text-white" />
+                    <NovaLogo size="sm" textColor="text-zinc-900 dark:text-white" />
                   </div>
-                  <p className="text-[10px] text-zinc-400 mt-1">452 Fifth Avenue, New York, NY 10018</p>
-                  <p className="text-[10px] text-zinc-400">HSBC Bank USA, N.A. | Member FDIC</p>
+                  <p className="text-[10px] text-zinc-400 mt-1">Nova Digital Banking Simulator</p>
+                  <p className="text-[10px] text-zinc-400">Portfolio Demonstration • Simulated Record</p>
                 </div>
 
                 <div className="text-right">

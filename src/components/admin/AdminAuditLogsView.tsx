@@ -54,7 +54,7 @@ export const AdminAuditLogsView: React.FC = () => {
             const encodedUri = encodeURI(csvContent);
             const link = document.createElement("a");
             link.setAttribute("href", encodedUri);
-            link.setAttribute("download", `hsbc_audit_logs_${new Date().toISOString().slice(0,10)}.csv`);
+            link.setAttribute("download", `nova_audit_logs_${new Date().toISOString().slice(0,10)}.csv`);
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);

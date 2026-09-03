@@ -70,7 +70,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, onNavigate }) => 
   const items = isAdminRole && currentView.startsWith('admin-') ? adminNavItems : customerNavItems;
 
   return (
-    <aside className="hidden lg:flex flex-col w-64 border-r border-[#38080E] bg-[#0E0103] h-[calc(100vh-5.5rem)] sticky top-[5.5rem] py-6 px-4 justify-between transition-colors">
+    <aside className="hidden lg:flex flex-col w-64 border-r border-[#38080E] bg-[#0E0103] h-[calc(100vh-4.5rem)] sticky top-[4.5rem] py-6 px-4 justify-between transition-colors">
       <div className="space-y-6">
         {/* Portal Switch Indicator or Account Security Box */}
         <div className="px-1">

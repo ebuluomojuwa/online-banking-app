@@ -17,22 +17,6 @@ import {
   UserRole 
 } from '../types';
 import { 
-  INITIAL_USERS, 
-  INITIAL_ACCOUNTS, 
-  INITIAL_TRANSACTIONS, 
-  INITIAL_BENEFICIARIES, 
-  INITIAL_CARDS, 
-  INITIAL_SAVINGS_GOALS, 
-  INITIAL_LOANS, 
-  INITIAL_BILLS, 
-  INITIAL_NOTIFICATIONS, 
-  INITIAL_LOGIN_SESSIONS, 
-  INITIAL_SECURITY_EVENTS, 
-  INITIAL_SUPPORT_TICKETS, 
-  INITIAL_FRAUD_ALERTS, 
-  INITIAL_AUDIT_LOGS 
-} from '../data/mockData';
-import { 
   db, 
   auth, 
   collection, 
@@ -55,8 +39,6 @@ import {
   updatePassword
 } from '../lib/firebase';
 import { 
-  seedFirestoreIfEmpty,
-  syncAllDataToFirestore,
   getUserProfileFromFirestore,
   findUserByEmailOrUsername,
   saveUserToFirestore,
@@ -172,8 +154,6 @@ export interface BankingContextType {
   ) => Promise<{ success: boolean; error?: string }>;
   revokeSession: (sessionId: string) => void;
   revokeAllOtherSessions: () => void;
-  resetAllDemoData: () => void;
-  resetAllData: () => void;
 
   // Admin Actions
   toggleFreezeUser: (userId: string) => void;
@@ -181,9 +161,6 @@ export interface BankingContextType {
   adminUpdateFraudAlert: (alertId: string, status: FraudAlert['status'], resolutionNote: string) => void;
   adminReverseTransaction: (transactionId: string) => void;
   reverseTransaction: (transactionId: string) => void;
-
-  // Cloud Firestore Sync
-  syncToFirestoreNow: () => Promise<{ success: boolean; totalSynced: number; error?: string }>;
 }
 
 const BankingContext = createContext<BankingContextType | undefined>(undefined);
@@ -193,8 +170,8 @@ const BLANK_USER: UserProfile = {
   customerId: '',
   username: '',
   email: '',
-  firstName: 'Premier',
-  lastName: 'Customer',
+  firstName: 'Private',
+  lastName: 'Client',
   role: 'CUSTOMER',
   phone: '',
   address: {
@@ -290,12 +267,12 @@ export const BankingProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   // Client UI Preferences
   const [hideBalances, setHideBalances] = useState<boolean>(() => {
-    const saved = localStorage.getItem('hsbc_hide_balances');
+    const saved = localStorage.getItem('nova_hide_balances');
     return saved ? JSON.parse(saved) : false;
   });
 
   const [theme, setThemeState] = useState<'light' | 'dark' | 'system'>(() => {
-    const saved = localStorage.getItem('hsbc_theme');
+    const saved = localStorage.getItem('nova_theme');
     return (saved as any) || 'dark';
   });
 
@@ -327,11 +304,11 @@ export const BankingProvider: React.FC<{ children: React.ReactNode }> = ({ child
   }, [isDarkMode]);
 
   useEffect(() => {
-    localStorage.setItem('hsbc_hide_balances', JSON.stringify(hideBalances));
+    localStorage.setItem('nova_hide_balances', JSON.stringify(hideBalances));
   }, [hideBalances]);
 
   useEffect(() => {
-    localStorage.setItem('hsbc_theme', theme);
+    localStorage.setItem('nova_theme', theme);
   }, [theme]);
 
   // Primary Firebase Authentication and Real-time Firestore Lifecycle
@@ -391,7 +368,7 @@ export const BankingProvider: React.FC<{ children: React.ReactNode }> = ({ child
               ...data, 
               id: uid,
               availableBalance: typeof data.availableBalance === 'number' ? data.availableBalance : 6000,
-              name: data.name || `${data.firstName || ''} ${data.lastName || ''}`.trim() || 'Premier Customer',
+              name: data.name || `${data.firstName || ''} ${data.lastName || ''}`.trim() || 'Private Client',
               accountNumber: data.accountNumber || '4821'
             };
             setCurrentUserProfile(profile);
@@ -409,7 +386,7 @@ export const BankingProvider: React.FC<{ children: React.ReactNode }> = ({ child
             if (data.availableBalance === undefined || data.availableBalance === null || !data.name || !data.accountNumber) {
               await updateDoc(userRef, {
                 availableBalance: typeof data.availableBalance === 'number' ? data.availableBalance : 6000,
-                name: data.name || `${data.firstName || ''} ${data.lastName || ''}`.trim() || 'Premier Customer',
+                name: data.name || `${data.firstName || ''} ${data.lastName || ''}`.trim() || 'Private Client',
                 accountNumber: data.accountNumber || '4821'
               }).catch(e => console.warn('Note updating user fields:', e));
             }
@@ -425,11 +402,11 @@ export const BankingProvider: React.FC<{ children: React.ReactNode }> = ({ child
               const newAcc: BankAccount = {
                 id: accDocId,
                 userId: uid,
-                name: 'HSBC Premier Checking',
+                name: 'Nova Premier Checking',
                 accountNumber: accNumber,
                 routingNumber: '021000089',
-                iban: `GB29MIDL400515${Math.floor(10000000 + Math.random() * 90000000)}`,
-                swift: 'HBUKGB41400',
+                iban: `GB29NOVA400515${Math.floor(10000000 + Math.random() * 90000000)}`,
+                swift: 'NOVAGB21',
                 type: 'CHECKING',
                 balance: 6000.00,
                 availableBalance: 6000.00,
@@ -452,7 +429,7 @@ export const BankingProvider: React.FC<{ children: React.ReactNode }> = ({ child
                 id: txDocId,
                 userId: uid,
                 accountId: accDocId,
-                accountName: `HSBC Premier Checking **${accNumber}`,
+                accountName: `Nova Premier Checking **${accNumber}`,
                 description: 'Deposit received from Feng Hong',
                 merchantName: 'Feng Hong',
                 recipientOrSender: 'Feng Hong',
@@ -522,10 +499,10 @@ export const BankingProvider: React.FC<{ children: React.ReactNode }> = ({ child
           } else {
             // Profile document doesn't exist yet: initialize user profile and primary account in Firestore under UID
             const cleanEmail = fbUser.email?.toLowerCase() || '';
-            const customerId = 'HSBC-CUST-' + Math.floor(100000 + Math.random() * 900000);
+            const customerId = 'NOVA-CUST-' + Math.floor(100000 + Math.random() * 900000);
             const nowIso = new Date().toISOString();
             const accNumber = '4821';
-            const fullName = `${fbUser.displayName || 'Premier Customer'}`.trim();
+            const fullName = `${fbUser.displayName || 'Private Client'}`.trim();
             const initialProfile: UserProfile = {
               id: uid,
               name: fullName,
@@ -534,8 +511,8 @@ export const BankingProvider: React.FC<{ children: React.ReactNode }> = ({ child
               customerId,
               username: cleanEmail.split('@')[0] || `user_${uid.slice(0, 5)}`,
               email: cleanEmail,
-              firstName: fbUser.displayName?.split(' ')[0] || 'Premier',
-              lastName: fbUser.displayName?.split(' ').slice(1).join(' ') || 'Customer',
+              firstName: fbUser.displayName?.split(' ')[0] || 'Private',
+              lastName: fbUser.displayName?.split(' ').slice(1).join(' ') || 'Client',
               role: 'CUSTOMER',
               phone: '+1 (555) 392-8104',
               address: {
@@ -575,11 +552,11 @@ export const BankingProvider: React.FC<{ children: React.ReactNode }> = ({ child
               const newAcc: BankAccount = {
                 id: accDocId,
                 userId: uid,
-                name: 'HSBC Premier Checking',
+                name: 'Nova Premier Checking',
                 accountNumber: accNumber,
                 routingNumber: '021000089',
-                iban: `GB29MIDL400515${Math.floor(10000000 + Math.random() * 90000000)}`,
-                swift: 'HBUKGB41400',
+                iban: `GB29NOVA400515${Math.floor(10000000 + Math.random() * 90000000)}`,
+                swift: 'NOVAGB21',
                 type: 'CHECKING',
                 balance: 6000.00,
                 availableBalance: 6000.00,
@@ -599,7 +576,7 @@ export const BankingProvider: React.FC<{ children: React.ReactNode }> = ({ child
                 id: `tx_${uid}_feng_hong`,
                 userId: uid,
                 accountId: accDocId,
-                accountName: `HSBC Premier Checking **${accNumber}`,
+                accountName: `Nova Premier Checking **${accNumber}`,
                 description: 'Deposit received from Feng Hong',
                 merchantName: 'Feng Hong',
                 recipientOrSender: 'Feng Hong',
@@ -625,7 +602,7 @@ export const BankingProvider: React.FC<{ children: React.ReactNode }> = ({ child
                 expiryYear: '2029',
                 cvv: '829',
                 cardType: 'DEBIT',
-                tier: 'HSBC Premier World',
+                tier: 'Nova Sapphire',
                 status: 'ACTIVE',
                 spendingLimit: 5000,
                 monthlySpent: 0,
@@ -840,7 +817,7 @@ export const BankingProvider: React.FC<{ children: React.ReactNode }> = ({ child
           await signOut(auth);
           return { 
             success: false, 
-            error: '[auth/user-suspended] This account has been temporarily locked by HSBC Security. Please contact Premier Support.' 
+            error: '[auth/user-suspended] This account has been temporarily locked by Nova Security. Please contact Support.' 
           };
         }
         await saveUserToFirestore({ ...profile, lastLogin: nowIso });
@@ -944,7 +921,7 @@ export const BankingProvider: React.FC<{ children: React.ReactNode }> = ({ child
       });
 
       const newUserId = fbUser.uid;
-      const customerId = 'HSBC-CUST-' + Math.floor(100000 + Math.random() * 900000);
+      const customerId = 'NOVA-CUST-' + Math.floor(100000 + Math.random() * 900000);
       const nowIso = new Date().toISOString();
 
       // 3. User Profile Document Stored Under UID
@@ -997,7 +974,7 @@ export const BankingProvider: React.FC<{ children: React.ReactNode }> = ({ child
         ? 'High-Yield Reserve Savings' 
         : accType === 'BUSINESS' 
           ? 'Executive Commercial Vault' 
-          : 'HSBC Premier Checking';
+          : 'Nova Premier Checking';
 
       const newAccount: BankAccount = {
         id: newAccId,
@@ -1005,8 +982,8 @@ export const BankingProvider: React.FC<{ children: React.ReactNode }> = ({ child
         name: accName,
         accountNumber: accNumber,
         routingNumber: '021000089',
-        iban: `GB29MIDL400515${Math.floor(10000000 + Math.random() * 90000000)}`,
-        swift: 'HBUKGB41400',
+        iban: `GB29NOVA400515${Math.floor(10000000 + Math.random() * 90000000)}`,
+        swift: 'NOVAGB21',
         type: accType,
         balance: 6000.00,
         availableBalance: 6000.00,
@@ -1049,7 +1026,7 @@ export const BankingProvider: React.FC<{ children: React.ReactNode }> = ({ child
         expiryYear: '2029',
         cvv: '829',
         cardType: 'DEBIT',
-        tier: 'HSBC Premier World',
+        tier: 'Nova Sapphire',
         status: 'ACTIVE',
         spendingLimit: 5000,
         monthlySpent: 0,
@@ -1104,7 +1081,7 @@ export const BankingProvider: React.FC<{ children: React.ReactNode }> = ({ child
               email: cleanEmail,
               username: cleanUsername,
               role: 'CUSTOMER',
-              customerId: 'HSBC-CUST-' + Math.floor(100000 + Math.random() * 900000),
+              customerId: 'NOVA-CUST-' + Math.floor(100000 + Math.random() * 900000),
               phone: '+1 (555) 392-8104',
               address: {
                 street: '450 Lexington Avenue',
@@ -1251,7 +1228,7 @@ export const BankingProvider: React.FC<{ children: React.ReactNode }> = ({ child
       currency: 'USD',
       status: 'Completed',
       date: nowIso,
-      reference: params.reference || `TRF-HSBC-${Date.now().toString().slice(-6)}`,
+      reference: params.reference || `TRF-NOVA-${Date.now().toString().slice(-6)}`,
       recipientOrSender: `${params.recipientName} **${params.recipientAccount.slice(-4)}`,
       fee: 0.00,
       riskScore: params.amount > 5000 ? 'Medium' : 'Low',
@@ -1455,7 +1432,7 @@ export const BankingProvider: React.FC<{ children: React.ReactNode }> = ({ child
       accountId: fromAcc.id,
       accountName: `${fromAcc.name} **${fromAcc.accountNumber}`,
       description: `Deposit to Goal: ${goal.name}`,
-      merchantName: 'HSBC Savings Vault',
+      merchantName: 'Nova Savings Vault',
       category: 'Transfer',
       amount: -amount,
       currency: 'USD',
@@ -1494,7 +1471,7 @@ export const BankingProvider: React.FC<{ children: React.ReactNode }> = ({ child
       accountId: toAcc.id,
       accountName: `${toAcc.name} **${toAcc.accountNumber}`,
       description: `Withdrawal from Goal: ${goal.name}`,
-      merchantName: 'HSBC Savings Vault',
+      merchantName: 'Nova Savings Vault',
       category: 'Transfer',
       amount: amount,
       currency: 'USD',
@@ -1547,7 +1524,7 @@ export const BankingProvider: React.FC<{ children: React.ReactNode }> = ({ child
       accountId: fromAcc.id,
       accountName: `${fromAcc.name} **${fromAcc.accountNumber}`,
       description: `Loan Repayment - ${loan.title}`,
-      merchantName: 'HSBC Credit & Lending',
+      merchantName: 'Nova Credit & Lending',
       category: 'Transfer',
       amount: -amount,
       currency: 'USD',
@@ -1783,23 +1760,6 @@ export const BankingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
   };
 
-  const resetAllDemoData = async () => {
-    await seedFirestoreIfEmpty(
-      INITIAL_USERS,
-      INITIAL_ACCOUNTS,
-      INITIAL_TRANSACTIONS,
-      INITIAL_BENEFICIARIES,
-      INITIAL_CARDS,
-      INITIAL_SAVINGS_GOALS,
-      INITIAL_LOANS,
-      INITIAL_BILLS,
-      INITIAL_NOTIFICATIONS,
-      INITIAL_SUPPORT_TICKETS,
-      INITIAL_FRAUD_ALERTS,
-      INITIAL_AUDIT_LOGS
-    );
-  };
-
   const toggleFreezeUser = async (userId: string) => {
     const target = allUsers.find(u => u.id === userId);
     if (target) {
@@ -1879,23 +1839,6 @@ export const BankingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     await saveAuditLogToFirestore(newAudit);
   };
 
-  const syncToFirestoreNow = async () => {
-    return await syncAllDataToFirestore(
-      allUsers,
-      accounts,
-      transactions,
-      beneficiaries,
-      cards,
-      savingsGoals,
-      loans,
-      bills,
-      notifications,
-      supportTickets,
-      fraudAlerts,
-      auditLogs
-    );
-  };
-
   return (
     <BankingContext.Provider
       value={{
@@ -1957,14 +1900,11 @@ export const BankingProvider: React.FC<{ children: React.ReactNode }> = ({ child
         changePassword,
         revokeSession,
         revokeAllOtherSessions,
-        resetAllDemoData,
-        resetAllData: resetAllDemoData,
         toggleFreezeUser,
         adminUpdateUserStatus,
         adminUpdateFraudAlert,
         adminReverseTransaction,
         reverseTransaction: adminReverseTransaction,
-        syncToFirestoreNow,
       }}
     >
       {children}

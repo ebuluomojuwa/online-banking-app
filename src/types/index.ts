@@ -82,7 +82,7 @@ export interface Beneficiary {
 }
 
 export type CardType = 'DEBIT' | 'CREDIT' | 'VIRTUAL';
-export type CardTier = 'HSBC Titanium' | 'HSBC Premier World' | 'HSBC Business Prime' | 'Nova Titanium' | 'Nova Sapphire' | 'Nova Business Prime';
+export type CardTier = 'Nova Titanium' | 'Nova Sapphire' | 'Nova Business Prime';
 export type CardStatus = 'ACTIVE' | 'FROZEN' | 'BLOCKED' | 'EXPIRED';
 
 export interface Card {
@@ -266,7 +266,7 @@ export interface UserProfile {
   name?: string;
   accountNumber?: string;
   availableBalance?: number;
-  customerId: string; // e.g. "HSBC-CUST-482019"
+  customerId: string; // e.g. "NOVA-CUST-482019"
   username: string; // e.g. "gregoriolind"
   password?: string;
   email: string;

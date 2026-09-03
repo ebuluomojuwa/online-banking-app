@@ -127,11 +127,16 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={step === 'verify' ? "Email Security Verification" : "Open an HSBC Account"}
-      description={step === 'verify' ? "Verify your email to complete registration." : "Instant onboarding with email security verification and automated funding."}
+      title={step === 'verify' ? "Email Security Verification" : "Open a Demo Account"}
+      description={step === 'verify' ? "Verify your email to complete registration." : "Interactive demonstration onboarding with simulated OTP and virtual demo funding."}
     >
       {step === 'form' ? (
         <form onSubmit={handleInitiateSubmit} className="space-y-4 text-xs">
+          {/* Safe Browsing Compliance Warning */}
+          <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/25 text-amber-800 dark:text-amber-300 text-xs">
+            ⚠️ <strong>Demonstration Sandbox:</strong> Please do not submit real financial passwords, credentials, or sensitive personal data.
+          </div>
+
           {error && (
             <div className="p-3.5 rounded-xl bg-rose-950/90 text-rose-200 border border-rose-700/80 space-y-2 text-xs">
               <div className="flex items-center gap-2">
@@ -225,9 +230,9 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
               onChange={e => setAccountType(e.target.value as any)}
               className="w-full p-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white"
             >
-              <option value="CHECKING">HSBC Premier Checking ($0 Monthly Fee)</option>
+              <option value="CHECKING">Nova Premier Checking (Demo - $0 Monthly Fee)</option>
               <option value="SAVINGS">High-Yield Reserve Savings (4.75% APY)</option>
-              <option value="BUSINESS">Institutional Commercial Vault</option>
+              <option value="BUSINESS">Institutional Commercial Vault (Demo)</option>
             </select>
           </div>
 

@@ -15,7 +15,7 @@ import {
   ChevronRight,
   Calculator
 } from 'lucide-react';
-import { HsbcLogo } from '../common/HsbcLogo';
+import { NovaLogo } from '../common/NovaLogo';
 
 interface LandingPageProps {
   onOpenLogin: () => void;
@@ -38,8 +38,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenLogin, onOpenReg
       <header className="sticky top-0 z-40 bg-[#0E0103]/90 backdrop-blur-md border-b border-[#38080E]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <HsbcLogo size="sm" />
-            <span className="hidden sm:inline-block text-[10px] text-rose-300/60 ml-2 font-mono">GLOBAL DIGITAL</span>
+            <NovaLogo size="sm" />
           </div>
 
           <div className="flex items-center gap-3">
@@ -50,10 +49,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenLogin, onOpenReg
               Sign In
             </button>
             <button
-              onClick={onEnterDemo}
+              onClick={onOpenRegister}
               className="px-4 py-2 rounded-xl bg-rose-500 text-white text-xs font-bold shadow-xs hover:bg-rose-600 transition-all flex items-center gap-1.5"
             >
-              Explore Live Demo <ArrowRight className="w-3.5 h-3.5" />
+              Get Started <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
         </div>
@@ -66,8 +65,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenLogin, onOpenReg
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-8">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#1C0407] border border-[#38080E] text-xs font-medium text-rose-200 shadow-2xs animate-in fade-in slide-in-from-top-2 duration-300">
-            <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
-            <span>Fictional Digital Banking Architecture Prototype</span>
+            <span className="w-2 h-2 rounded-full bg-emerald-500" />
+            <span className="tracking-wide text-xs">Next-Generation Private Digital Banking</span>
           </div>
 
           <div className="space-y-4 max-w-4xl mx-auto">
@@ -146,7 +145,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenLogin, onOpenReg
               <div className="w-12 h-12 rounded-2xl bg-rose-500/20 text-rose-400 flex items-center justify-center font-bold">
                 <CreditCard className="w-6 h-6" />
               </div>
-              <h3 className="text-lg font-bold text-white">HSBC Premier Cards</h3>
+              <h3 className="text-lg font-bold text-white">Nova Premier Cards</h3>
               <p className="text-xs text-rose-300/80 leading-relaxed">
                 Precision-milled physical cards and disposable virtual card numbers with instant in-app freeze controls and NFC toggles.
               </p>
@@ -176,7 +175,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenLogin, onOpenReg
               Calculate your wealth accumulation
             </h2>
             <p className="text-xs text-rose-300/70">
-              See how your reserves grow with HSBC's 4.75% APY compounding rate.
+              See how your reserves grow with Nova's 4.75% APY compounding rate.
             </p>
           </div>
 
@@ -247,16 +246,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenLogin, onOpenReg
       <footer className="bg-[#0E0103] border-t border-[#38080E] py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 text-center sm:text-left">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <HsbcLogo size="sm" />
+            <NovaLogo size="sm" />
             <p className="text-xs text-rose-300/70">
-              “Together we thrive.”
+              Modern Digital Banking UI Portfolio Demo
             </p>
           </div>
 
           <div className="p-4 rounded-2xl bg-[#1C0407] text-[11px] text-rose-300/70 space-y-1">
-            <p className="font-bold text-white">Prototype Disclaimer Notice:</p>
+            <p className="font-bold text-white">Demonstration & Safe Browsing Notice:</p>
             <p>
-              HSBC Digital Banking is a software demonstration prototype. It does not connect to live banking clearing networks, does not solicit real deposits, and does not conduct actual financial transactions. All balance and ledger figures shown are purely simulated.
+              Nova Digital Banking is an interactive software demonstration application built for portfolio showcase purposes. It does not provide real commercial banking services, does not connect to live financial clearing networks, does not solicit real money or deposits, and does not collect or store real banking credentials, passwords, or payment card numbers. All balances, accounts, and transactions are strictly simulated mock data.
             </p>
           </div>
         </div>
