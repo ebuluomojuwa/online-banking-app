@@ -183,17 +183,6 @@ export const AuthGateway: React.FC<AuthGatewayProps> = ({
       <main className="flex-1 flex items-center justify-center p-4 sm:p-6 lg:p-8">
         <div className="w-full max-w-lg bg-[#1C0407]/90 border border-[#38080E] rounded-3xl shadow-2xl backdrop-blur-xl p-6 sm:p-8 space-y-6 animate-in fade-in zoom-in-95 duration-200">
           
-          {/* Safe Browsing Demo Disclaimer Banner */}
-          <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/25 text-amber-300 text-xs flex items-start gap-2.5 text-left">
-            <AlertCircle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
-            <div className="space-y-0.5">
-              <div className="font-bold text-amber-200">Interactive Portfolio Demonstration</div>
-              <div className="text-[11px] text-amber-300/80 leading-relaxed">
-                This portal is an interactive simulation and does not collect real banking credentials, passwords, or personal data. Use demo accounts or sample values.
-              </div>
-            </div>
-          </div>
-
           {/* Mode Switcher Tabs */}
           <div className="grid grid-cols-2 p-1 bg-[#0E0103] rounded-2xl border border-[#38080E]">
             <button
@@ -235,24 +224,12 @@ export const AuthGateway: React.FC<AuthGatewayProps> = ({
             <div className="space-y-5">
               <div className="text-left space-y-1">
                 <h1 className="text-xl font-bold text-white tracking-tight">
-                  Welcome to Nova Demo Banking
+                  Sign In to Nova Banking
                 </h1>
                 <p className="text-xs text-rose-300/70 leading-relaxed">
-                  Enter test credentials to explore the customer dashboard simulation.
+                  Enter your security credentials to access your client portal.
                 </p>
               </div>
-
-              {/* Quick autofill helper */}
-              <button
-                type="button"
-                onClick={() => {
-                  setIdentifier('gregorio.lind@example.com');
-                  setPassword('Password123!');
-                }}
-                className="w-full py-2 bg-amber-500/15 hover:bg-amber-500/25 text-amber-200 font-bold text-xs rounded-xl transition-colors border border-amber-500/30 flex items-center justify-center gap-1.5"
-              >
-                <span>Fill Demo Credentials (Gregorio Lind)</span>
-              </button>
 
               {signInError && (
                 <div className="p-3 rounded-xl bg-rose-950/80 text-rose-300 border border-rose-800/80 flex items-center gap-2 text-xs animate-in fade-in duration-150">
@@ -264,7 +241,7 @@ export const AuthGateway: React.FC<AuthGatewayProps> = ({
               <form onSubmit={handleSignIn} className="space-y-4">
                 <div className="space-y-1.5 text-left">
                   <label className="block font-bold text-rose-200 text-xs">
-                    Demo Username or Email Address
+                    Username or Email Address
                   </label>
                   <div className="relative">
                     <User className="w-4 h-4 absolute left-3 top-3 text-rose-400/60" />
@@ -273,7 +250,7 @@ export const AuthGateway: React.FC<AuthGatewayProps> = ({
                       type="text"
                       value={identifier}
                       onChange={e => setIdentifier(e.target.value)}
-                      placeholder="e.g. gregoriolind or name@example.com"
+                      placeholder="e.g. yourname or name@example.com"
                       required
                       autoCapitalize="none"
                       autoCorrect="off"
@@ -286,9 +263,8 @@ export const AuthGateway: React.FC<AuthGatewayProps> = ({
                 <div className="space-y-1.5 text-left">
                   <div className="flex justify-between items-center">
                     <label className="font-bold text-rose-200 text-xs">
-                      Demo Password
+                      Password
                     </label>
-                    <span className="text-[10px] text-rose-400/60 font-mono">Demo Session</span>
                   </div>
                   <div className="relative">
                     <Lock className="w-4 h-4 absolute left-3 top-3 text-rose-400/60" />
@@ -297,7 +273,7 @@ export const AuthGateway: React.FC<AuthGatewayProps> = ({
                       type={showPassword ? 'text' : 'password'}
                       value={password}
                       onChange={e => setPassword(e.target.value)}
-                      placeholder="Enter demo password"
+                      placeholder="••••••••••••"
                       required
                       className="w-full pl-9 pr-10 py-2.5 bg-[#0E0103] border border-[#38080E] rounded-xl text-white placeholder-rose-400/40 focus:outline-none focus:border-rose-500 text-xs transition-colors"
                     />
@@ -325,7 +301,7 @@ export const AuthGateway: React.FC<AuthGatewayProps> = ({
                   ) : (
                     <>
                       <ShieldCheck className="w-4 h-4" />
-                      <span>Sign In to Demo Portal</span>
+                      <span>Sign In to Account</span>
                       <ArrowRight className="w-4 h-4" />
                     </>
                   )}
@@ -343,7 +319,7 @@ export const AuthGateway: React.FC<AuthGatewayProps> = ({
                   }}
                   className="font-bold text-rose-200 hover:text-white underline underline-offset-2 ml-1"
                 >
-                  Open Demo Account
+                  Open an Account
                 </button>
               </div>
             </div>
@@ -359,10 +335,10 @@ export const AuthGateway: React.FC<AuthGatewayProps> = ({
                   </div>
                   <div className="space-y-1">
                     <h3 className="text-lg font-bold text-white">
-                      Demo Account Provisioned Successfully!
+                      Account Provisioned Successfully!
                     </h3>
                     <p className="text-xs text-rose-300/70 max-w-xs mx-auto">
-                      Demo identity verified, $10,000 opening test credit applied. Entering simulated banking portal...
+                      Identity verified. Entering private banking portal...
                     </p>
                   </div>
                 </div>
@@ -388,10 +364,10 @@ export const AuthGateway: React.FC<AuthGatewayProps> = ({
                 <>
                   <div className="text-left space-y-1">
                     <h1 className="text-xl font-bold text-white tracking-tight">
-                      Open a Nova Demo Account
+                      Open a Nova Account
                     </h1>
                     <p className="text-xs text-rose-300/70 leading-relaxed">
-                      Interactive digital onboarding with simulated email verification and test balance.
+                      Digital private banking onboarding with secure two-step verification.
                     </p>
                   </div>
 

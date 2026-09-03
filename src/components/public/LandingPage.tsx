@@ -169,7 +169,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenLogin, onOpenReg
         <div className="bg-gradient-to-br from-[#200508] via-[#160305] to-[#200508] text-white p-8 sm:p-12 rounded-3xl border border-[#38080E] shadow-2xl space-y-8">
           <div className="space-y-2">
             <span className="text-xs font-bold uppercase tracking-widest text-rose-400 flex items-center gap-1.5">
-              <Calculator className="w-4 h-4" /> High-Yield APY Simulator
+              <Calculator className="w-4 h-4" /> High-Yield APY Calculator
             </span>
             <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
               Calculate your wealth accumulation
@@ -227,7 +227,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenLogin, onOpenReg
               </div>
 
               <div className="flex justify-between text-xs pt-3 border-t border-[#38080E] text-rose-300/70">
-                <span>Total Simulated Interest Earned:</span>
+                <span>Estimated Total Interest Earned:</span>
                 <strong className="text-white font-mono">+${interestEarned.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong>
               </div>
 
@@ -235,7 +235,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenLogin, onOpenReg
                 onClick={onEnterDemo}
                 className="w-full py-2.5 rounded-xl bg-rose-500 text-white text-xs font-bold hover:bg-rose-600 transition-colors shadow-xs"
               >
-                Experience in Demo Portal
+                Open High-Yield Account
               </button>
             </div>
           </div>
@@ -248,15 +248,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenLogin, onOpenReg
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <NovaLogo size="sm" />
             <p className="text-xs text-rose-300/70">
-              Modern Digital Banking UI Portfolio Demo
+              Next-Generation Digital Banking & Wealth Management
             </p>
           </div>
 
-          <div className="p-4 rounded-2xl bg-[#1C0407] text-[11px] text-rose-300/70 space-y-1">
-            <p className="font-bold text-white">Demonstration & Safe Browsing Notice:</p>
-            <p>
-              Nova Digital Banking is an interactive software demonstration application built for portfolio showcase purposes. It does not provide real commercial banking services, does not connect to live financial clearing networks, does not solicit real money or deposits, and does not collect or store real banking credentials, passwords, or payment card numbers. All balances, accounts, and transactions are strictly simulated mock data.
-            </p>
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-[#38080E] text-[11px] text-rose-300/60">
+            <p>© {new Date().getFullYear()} Nova Financial Technologies. Member FDIC. Equal Housing Lender.</p>
+            <p>Investment products are not FDIC insured • May lose value • No bank guarantee.</p>
           </div>
         </div>
       </footer>

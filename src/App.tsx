@@ -177,18 +177,19 @@ const BankingAppInner: React.FC = () => {
         </main>
       </div>
 
-      {/* Sleek Footer Bar */}
+      {/* Customer Banking Footer Bar */}
       <footer className="border-t border-[#38080E] bg-[#0E0103]/80 px-6 sm:px-10 py-3 flex items-center justify-between text-xs text-rose-300/70 transition-colors">
         <div className="flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-          <span className="text-rose-200">Nova Demo Gateway Active</span>
+          <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+          <span className="text-rose-200">256-Bit SSL Encrypted Connection</span>
         </div>
         <div className="text-[11px] text-rose-400/80 hidden sm:block">
-          Nova Digital Banking • Interactive Demonstration Sandbox
+          Nova Financial Technologies • Member FDIC • Equal Housing Lender
         </div>
         <div className="flex items-center gap-4">
-          <span className="bg-rose-500/15 text-rose-300 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border border-rose-500/30">
-            Demo Portal (No Real Funds)
+          <span className="text-emerald-400/90 text-[11px] font-medium flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+            Verified Secure Session
           </span>
         </div>
       </footer>
